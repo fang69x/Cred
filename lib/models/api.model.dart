@@ -1,97 +1,120 @@
-class ApiResponse {
-  final List<Item> items;
+class CredModel {
+  CredModel({
+    required this.items,
+  });
 
-  ApiResponse({required this.items});
+  final List<CredModelItem> items;
 
-  factory ApiResponse.fromJson(Map<String, dynamic> json) {
-    return ApiResponse(
-      items: List<Item>.from(json['items'].map((x) => Item.fromJson(x))),
+  factory CredModel.fromJson(Map<String, dynamic> json) {
+    return CredModel(
+      items: json["items"] == null
+          ? []
+          : List<CredModelItem>.from(
+              json["items"]!.map((x) => CredModelItem.fromJson(x))),
     );
   }
 }
 
-class Item {
-  final OpenState openState;
-  final ClosedState closedState;
-  final String ctaText;
+class CredModelItem {
+  CredModelItem({
+    required this.openState,
+    required this.closedState,
+    required this.ctaText,
+  });
 
-  Item(
-      {required this.openState,
-      required this.closedState,
-      required this.ctaText});
+  final OpenState? openState;
+  final ClosedState? closedState;
+  final String? ctaText;
 
-  factory Item.fromJson(Map<String, dynamic> json) {
-    return Item(
-      openState: OpenState.fromJson(json['open_state']),
-      closedState: ClosedState.fromJson(json['closed_state']),
-      ctaText: json['cta_text'],
-    );
-  }
-}
-
-class OpenState {
-  final Body body;
-
-  OpenState({required this.body});
-
-  factory OpenState.fromJson(Map<String, dynamic> json) {
-    return OpenState(
-      body: Body.fromJson(json['body']),
+  factory CredModelItem.fromJson(Map<String, dynamic> json) {
+    return CredModelItem(
+      openState: json["open_state"] == null
+          ? null
+          : OpenState.fromJson(json["open_state"]),
+      closedState: json["closed_state"] == null
+          ? null
+          : ClosedState.fromJson(json["closed_state"]),
+      ctaText: json["cta_text"],
     );
   }
 }
 
 class ClosedState {
-  final Body body;
+  ClosedState({
+    required this.body,
+  });
 
-  ClosedState({required this.body});
+  final ClosedStateBody? body;
 
   factory ClosedState.fromJson(Map<String, dynamic> json) {
     return ClosedState(
-      body: Body.fromJson(json['body']),
+      body:
+          json["body"] == null ? null : ClosedStateBody.fromJson(json["body"]),
     );
   }
 }
 
-class Body {
-  final String? title;
-  final String? subtitle;
-  final String? footer;
-  final Card? card;
-  final List<ItemDetails>? items;
-  final Map<String, String>? key1;
-
-  Body({
-    this.title,
-    this.subtitle,
-    this.footer,
-    this.card,
-    this.items,
-    this.key1,
+class ClosedStateBody {
+  ClosedStateBody({
+    required this.key1,
+    required this.key2,
   });
 
-  factory Body.fromJson(Map<String, dynamic> json) {
-    return Body(
-      title: json['title'],
-      subtitle: json['subtitle'],
-      footer: json['footer'],
-      card: json['card'] != null ? Card.fromJson(json['card']) : null,
-      items: json['items'] != null
-          ? List<ItemDetails>.from(
-              json['items'].map((x) => ItemDetails.fromJson(x)))
-          : null,
-      key1:
-          json['key1'] != null ? Map<String, String>.from(json['key1']) : null,
+  final String? key1;
+  final String? key2;
+
+  factory ClosedStateBody.fromJson(Map<String, dynamic> json) {
+    return ClosedStateBody(
+      key1: json["key1"],
+      key2: json["key2"],
+    );
+  }
+}
+
+class OpenState {
+  OpenState({
+    required this.body,
+  });
+
+  final OpenStateBody? body;
+
+  factory OpenState.fromJson(Map<String, dynamic> json) {
+    return OpenState(
+      body: json["body"] == null ? null : OpenStateBody.fromJson(json["body"]),
+    );
+  }
+}
+
+class OpenStateBody {
+  OpenStateBody({
+    required this.title,
+    required this.subtitle,
+    required this.card,
+    required this.footer,
+    required this.items,
+  });
+
+  final String title;
+  final String subtitle;
+  final Card? card;
+  final String? footer;
+  final List<BodyItem> items;
+
+  factory OpenStateBody.fromJson(Map<String, dynamic> json) {
+    return OpenStateBody(
+      title: json["title"],
+      subtitle: json["subtitle"],
+      card: json["card"] == null ? null : Card.fromJson(json["card"]),
+      footer: json["footer"],
+      items: json["items"] == null
+          ? []
+          : List<BodyItem>.from(
+              json["items"]!.map((x) => BodyItem.fromJson(x))),
     );
   }
 }
 
 class Card {
-  final String header;
-  final String description;
-  final int maxRange;
-  final int minRange;
-
   Card({
     required this.header,
     required this.description,
@@ -99,38 +122,46 @@ class Card {
     required this.minRange,
   });
 
+  final String? header;
+  final String? description;
+  final int? maxRange;
+  final int? minRange;
+
   factory Card.fromJson(Map<String, dynamic> json) {
     return Card(
-      header: json['header'],
-      description: json['description'],
-      maxRange: json['max_range'],
-      minRange: json['min_range'],
+      header: json["header"],
+      description: json["description"],
+      maxRange: json["max_range"],
+      minRange: json["min_range"],
     );
   }
 }
 
-class ItemDetails {
-  final String emi;
-  final String duration;
-  final String title;
-  final String subtitle;
-  final String? tag;
-
-  ItemDetails({
+class BodyItem {
+  BodyItem({
     required this.emi,
     required this.duration,
     required this.title,
     required this.subtitle,
-    this.tag,
+    required this.tag,
+    required this.icon,
   });
 
-  factory ItemDetails.fromJson(Map<String, dynamic> json) {
-    return ItemDetails(
-      emi: json['emi'],
-      duration: json['duration'],
-      title: json['title'],
-      subtitle: json['subtitle'],
-      tag: json['tag'],
+  final String? emi;
+  final String? duration;
+  final String? title;
+  final dynamic? subtitle;
+  final String? tag;
+  final String? icon;
+
+  factory BodyItem.fromJson(Map<String, dynamic> json) {
+    return BodyItem(
+      emi: json["emi"],
+      duration: json["duration"],
+      title: json["title"],
+      subtitle: json["subtitle"],
+      tag: json["tag"],
+      icon: json["icon"],
     );
   }
 }

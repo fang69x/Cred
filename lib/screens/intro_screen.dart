@@ -1,11 +1,10 @@
 import 'package:cred/screens/stacks/screen_1.dart';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class IntroScreen extends StatefulWidget {
   static const routeName = "/intro";
-  const IntroScreen({Key? key}) : super(key: key); // Fixed key parameter
+  const IntroScreen({super.key}); // Fixed key parameter
 
   @override
   State<IntroScreen> createState() => _IntroScreenState();

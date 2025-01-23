@@ -1,3 +1,5 @@
+import 'package:cred/models/api.model.dart';
+import 'package:cred/service/api.service.dart';
 import 'package:cred/utils/common_widgets.dart';
 import 'package:cred/utils/media_query.dart';
 import 'package:flutter/material.dart';
@@ -20,8 +22,7 @@ class Screen1 extends StatefulWidget {
   final Function handleEMIPlan;
 
   const Screen1(
-      {Key? key, required this.handleBackButton, required this.handleEMIPlan})
-      : super(key: key);
+      {super.key, required this.handleBackButton, required this.handleEMIPlan});
 
   @override
   _Screen1State createState() => _Screen1State();
@@ -32,6 +33,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
   late Animation<double> slideAnimation;
   Screen1Provider provider = Screen1Provider();
   late LoanData loanDataObj;
+  late Future<CredModel> futureApiResponse;
 
   @override
   void initState() {
@@ -42,6 +44,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
         Tween<double>(begin: 0.0, end: 0.78).animate(slideController);
     loanDataObj = LoanData();
     super.initState();
+    futureApiResponse = Apiservice.fetchData();
   }
 
   @override
@@ -53,18 +56,55 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Column(
-          children: [
-            _hudElement(),
-            ChangeNotifierProvider.value(
-                value: provider, child: _stackPopupContent()),
-          ],
-        ),
-        ChangeNotifierProvider.value(value: provider, child: _openStackPopup()),
-      ],
-    );
+    return FutureBuilder<CredModel>(
+        future: futureApiResponse,
+        builder: (BuildContext context, AsyncSnapshot<CredModel> snapshot) {
+          {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            }
+
+            if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            }
+
+            if (!snapshot.hasData || snapshot.data!.items.isEmpty) {
+              return Center(child: Text('No data available'));
+            }
+
+            // Access API data directly
+            final firstItem = snapshot.data!.items[0];
+            final openState = firstItem.openState!.body;
+
+            return Stack(
+              children: [
+                Column(
+                  children: [
+                    _hudElement(),
+                    // Title from API
+                    if (openState?.title != null)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Text(
+                          openState!.title,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+
+                    ChangeNotifierProvider.value(
+                        value: provider, child: _stackPopupContent()),
+                  ],
+                ),
+                ChangeNotifierProvider.value(
+                    value: provider, child: _openStackPopup()),
+              ],
+            );
+          }
+        });
   }
 
   Widget _stackPopupContent() {

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:neopop/widgets/buttons/neopop_button/neopop_button.dart';
 import 'package:provider/provider.dart';
-
 import '../../constants/strings_constants.dart';
 import '../../helperWidgets/emi_plan.dart';
 import '../../models/emi_plan_model.dart';

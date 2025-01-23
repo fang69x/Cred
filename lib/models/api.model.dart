@@ -97,7 +97,7 @@ class OpenStateBody {
   final String title;
   final String subtitle;
   final Card? card;
-  final String? footer;
+  final String footer;
   final List<BodyItem> items;
 
   factory OpenStateBody.fromJson(Map<String, dynamic> json) {
@@ -122,10 +122,10 @@ class Card {
     required this.minRange,
   });
 
-  final String? header;
-  final String? description;
-  final int? maxRange;
-  final int? minRange;
+  final String header;
+  final String description;
+  final int maxRange;
+  final int minRange;
 
   factory Card.fromJson(Map<String, dynamic> json) {
     return Card(

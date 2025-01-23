@@ -1,3 +1,4 @@
+import 'package:cred/helperWidgets/curved_edge_button.dart';
 import 'package:cred/models/api.model.dart';
 import 'package:cred/service/api.service.dart';
 import 'package:cred/utils/common_widgets.dart';
@@ -74,29 +75,21 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
 
             // Access API data directly
             final firstItem = snapshot.data!.items[0];
+            final claT = firstItem.ctaText;
             final openState = firstItem.openState!.body;
 
             return Stack(
               children: [
                 Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _hudElement(),
-                    // Title from API
-                    if (openState?.title != null)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text(
-                          openState!.title,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
+
+                    //
 
                     ChangeNotifierProvider.value(
-                        value: provider, child: _stackPopupContent()),
+                        value: provider,
+                        child: _stackPopupContent(openState!, claT!)),
                   ],
                 ),
                 ChangeNotifierProvider.value(
@@ -107,15 +100,15 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
         });
   }
 
-  Widget _stackPopupContent() {
+  Widget _stackPopupContent(OpenStateBody openState, String claT) {
     return Stack(
       children: [
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
           child: Consumer<Screen1Provider>(builder: (context, provider, child) {
             return provider.getIsEmiClicked()
-                ? _stackPopupView()
-                : _originalView();
+                ? _stackPopupView(openState)
+                : _originalView(openState, claT);
           }),
         ),
       ],
@@ -138,7 +131,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
   }
 
   /// View when stack is open
-  Widget _stackPopupView() {
+  Widget _stackPopupView(OpenStateBody openState) {
     return GestureDetector(
       onTap: () {
         _reverseStackPopupAnim();
@@ -174,7 +167,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ..._selectedAmountWidget(),
+                      ..._selectedAmountWidget(openState),
                     ],
                   ),
                   const Expanded(
@@ -225,67 +218,124 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
   }
 
   /// Widget when stack is not visisble
-  Widget _originalView() {
+  Widget _originalView(OpenStateBody openState, String claT) {
     return GestureDetector(
       onTap: () {
         _reverseStackPopupAnim();
       },
       child: Column(
         key: ValueKey(
-            'originalViewKey' "${StackPopupModel.getCurrentStackPopupIndex()}"),
+            'originalViewKey${StackPopupModel.getCurrentStackPopupIndex()}'),
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              SizedBox(
-                width: MediaQueryUtil.getValueInPixel(150),
-              ),
-              Column(
+          // Title and Subtitle
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  openState.title,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  openState.subtitle,
+                  style: TextStyle(
+                    color: const Color.fromARGB(255, 117, 117, 117),
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
+            child: _selectBankWidget(),
+          ),
+          SizedBox(height: MediaQueryUtil.getDefaultHeightDim(50)),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 15,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _howMuchWidget(),
-                  SizedBox(
-                    height: MediaQueryUtil.getValueInPixel(50),
+                  Text(
+                    openState.card!.header,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
-                  _selectBankWidget(),
+                  SizedBox(height: 10),
+                  Text(
+                    openState.card!.description,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black.withOpacity(0.7),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  CircularProgressBar(
+                    radius: 100,
+                    strokeWidth: 10,
+                    progressColor: Colors.greenAccent,
+                    arrowColor: Colors.white,
+                    progress: 0.5,
+                    startValue: 100000,
+                    endValue: 150000,
+                    onChanged: (double progress, int finalValue) {
+                      loanDataObj.setLoanAmout(finalValue);
+                    },
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    openState.footer,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.black.withOpacity(0.6),
+                    ),
+                  ),
                 ],
-              )
-            ],
+              ),
+            ),
           ),
-          SizedBox(
-            height: MediaQueryUtil.getDefaultHeightDim(300),
+          SizedBox(height: 150),
+          Padding(
+            padding: const EdgeInsets.only(top: 50),
+            child: CurvedEdgeButton(
+              text: claT,
+              onTap: () {
+                if (provider.getIsEmiClicked()) {
+                  return;
+                }
+                provider.setIsEmiClicked(true);
+                widget.handleEMIPlan();
+              },
+            ),
           ),
-          CircularProgressBar(
-            radius: 100,
-            strokeWidth: 10,
-            progressColor: Colors.greenAccent,
-            arrowColor: Colors.white,
-            progress: 0.5,
-            startValue: 100000,
-            endValue: 150000,
-            onChanged: (double progress, int finalValue) {
-              loanDataObj.setLoanAmout(finalValue);
-            },
-          ),
-          SizedBox(
-            height: MediaQueryUtil.getDefaultHeightDim(400),
-          ),
-          _getNeoPopButton(),
         ],
       ),
     );
   }
 
   /// Helpers widget
-  Widget _howMuchWidget() {
-    return CommonWidgets.FontWidget(
-        StringConstants.howMuchDoYouWant,
-        Colors.white,
-        FontWeight.w500,
-        "Roboto",
-        FontStyle.normal,
-        80,
-        TextAlign.left);
-  }
 
   Widget _selectBankWidget() {
     return CommonWidgets.FontWidget(
@@ -298,10 +348,10 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
         TextAlign.left);
   }
 
-  List<Widget> _selectedAmountWidget() {
+  List<Widget> _selectedAmountWidget(OpenStateBody openState) {
     List<Widget> li = [];
     li.add(CommonWidgets.FontWidget(
-        StringConstants.selectedAmount,
+        openState.card!.header.toString(),
         Colors.white.withOpacity(0.5),
         FontWeight.w400,
         "Roboto",
@@ -337,39 +387,5 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
     if (provider.getIsEmiClicked()) {
       slideController.reverse();
     }
-  }
-
-  Widget _getNeoPopButton() {
-    return NeoPopButton(
-      color: Colors.white,
-      onTapUp: () => HapticFeedback.vibrate(),
-      onTapDown: () {
-        if (provider.getIsEmiClicked()) {
-          return;
-        }
-        provider.setIsEmiClicked(true);
-        widget.handleEMIPlan();
-      },
-      child: SizedBox(
-        height: MediaQueryUtil.getValueInPixel(200),
-        width: MediaQueryUtil.getValueInPixel(1200),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CommonWidgets.FontWidget(
-                  StringConstants.chooseEMI,
-                  Colors.black,
-                  FontWeight.w600,
-                  "Inter",
-                  FontStyle.normal,
-                  70,
-                  TextAlign.left)
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

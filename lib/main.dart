@@ -1,7 +1,9 @@
+import 'package:cred/providers/data.provider.dart';
 import 'package:cred/screens/home.screen.dart';
 import 'package:cred/screens/intro_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,10 +23,13 @@ class Cred extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      initialRoute: initialRoute,
-      routes: routes,
-      debugShowCheckedModeBanner: false,
+    return ChangeNotifierProvider(
+      create: (context) => DataProvider(),
+      child: MaterialApp(
+        initialRoute: initialRoute,
+        routes: routes,
+        debugShowCheckedModeBanner: false,
+      ),
     );
   }
 }

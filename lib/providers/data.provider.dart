@@ -1,6 +1,6 @@
-import 'package:cred/service/api.service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cred/models/api.model.dart';
+import 'package:cred/service/api.service.dart';
 
 class DataProvider with ChangeNotifier {
   CredModel? _apiResponse;

@@ -1,16 +1,14 @@
+import 'package:cred/helperWidgets/circular_progress_bar.dart';
 import 'package:cred/helperWidgets/curved_edge_button.dart';
 import 'package:cred/models/api.model.dart';
 import 'package:cred/service/api.service.dart';
 import 'package:cred/utils/common_widgets.dart';
 import 'package:cred/utils/media_query.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
-import 'package:neopop/widgets/buttons/neopop_button/neopop_button.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:syncfusion_flutter_gauges/gauges.dart';
 
-import '../../constants/strings_constants.dart';
-import '../../helperWidgets/circular_progress_bar.dart';
 import '../../providers/screen_1_provider.dart';
 
 import '../../models/loan_data.dart';
@@ -81,12 +79,11 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
             return Stack(
               children: [
                 Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _hudElement(),
-
                     //
-
                     ChangeNotifierProvider.value(
                         value: provider,
                         child: _stackPopupContent(openState!, claT!)),
@@ -104,7 +101,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
     return Stack(
       children: [
         AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 100),
           child: Consumer<Screen1Provider>(builder: (context, provider, child) {
             return provider.getIsEmiClicked()
                 ? _stackPopupView(openState)
@@ -167,7 +164,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ..._selectedAmountWidget(openState),
+                      ..._selectedAmountWidget(),
                     ],
                   ),
                   const Expanded(
@@ -255,70 +252,22 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
           ),
           Padding(
             padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
-            child: _selectBankWidget(),
           ),
           SizedBox(height: MediaQueryUtil.getDefaultHeightDim(50)),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 15,
-                  offset: Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    openState.card!.header,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    openState.card!.description,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black.withOpacity(0.7),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  CircularProgressBar(
-                    radius: 100,
-                    strokeWidth: 10,
-                    progressColor: Colors.greenAccent,
-                    arrowColor: Colors.white,
-                    progress: 0.5,
-                    startValue: 100000,
-                    endValue: 150000,
-                    onChanged: (double progress, int finalValue) {
-                      loanDataObj.setLoanAmout(finalValue);
-                    },
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    openState.footer,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.black.withOpacity(0.6),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+
+          CreditCardWidget(
+            minRange: openState.card!.minRange.toDouble(),
+            maxRange: openState.card!.maxRange.toDouble(),
+            header: openState.card!.header,
+            footer: openState.footer,
+            description: openState.card!.description,
+            onChanged: (double progress, int finalValue) {
+              loanDataObj.setLoanAmount(finalValue);
+            },
           ),
-          SizedBox(height: 150),
+
           Padding(
-            padding: const EdgeInsets.only(top: 50),
+            padding: const EdgeInsets.only(top: 40),
             child: CurvedEdgeButton(
               text: claT,
               onTap: () {
@@ -337,28 +286,19 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
 
   /// Helpers widget
 
-  Widget _selectBankWidget() {
-    return CommonWidgets.FontWidget(
-        StringConstants.anyAmount,
-        Colors.white.withOpacity(0.6),
-        FontWeight.w500,
-        "Roboto",
-        FontStyle.normal,
-        60,
-        TextAlign.left);
-  }
-
-  List<Widget> _selectedAmountWidget(OpenStateBody openState) {
+  List<Widget> _selectedAmountWidget() {
     List<Widget> li = [];
+    String selectedAmount = loanDataObj.getLoanAmount().toString();
+
     li.add(CommonWidgets.FontWidget(
-        openState.card!.header.toString(),
-        Colors.white.withOpacity(0.5),
+        NumberFormat.currency(locale: 'en_IN', symbol: '₹ ', decimalDigits: 0)
+            .format(loanDataObj.getLoanAmount()),
+        Colors.white.withOpacity(0.6),
         FontWeight.w400,
         "Roboto",
         FontStyle.normal,
         60,
-        TextAlign.left));
-    // li.add(CommonWidgets.FontWidget(NumberFormat.currency(locale: 'en_IN', symbol: '₹ ', decimalDigits: 0).format(loanDataObj.getLoanAmount()), Colors.white.withOpacity(0.6), FontWeight.w400, "Roboto", FontStyle.normal, 60, TextAlign.center));
+        TextAlign.center));
 
     return li;
   }

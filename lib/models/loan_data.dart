@@ -5,7 +5,7 @@ class LoanData {
     return loanAmount;
   }
 
-  void setLoanAmout(int val) {
+  void setLoanAmount(int val) {
     loanAmount = val;
   }
 }

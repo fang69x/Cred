@@ -1,213 +1,163 @@
-import 'package:cred/utils/common_widgets.dart';
-import 'package:cred/utils/media_query.dart';
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
-import '../constants/strings_constants.dart';
+import 'package:syncfusion_flutter_gauges/gauges.dart';
 
-class CircularProgressBar extends StatefulWidget {
-  final double radius;
-  final double strokeWidth;
-  final Color progressColor;
-  final Color arrowColor;
-  final double progress;
-  final int startValue;
-  final int endValue;
-  final Function(double, int) onChanged;
+class CreditCardWidget extends StatefulWidget {
+  final double minRange;
+  final double maxRange;
+  final String header;
+  final String description;
+  final String footer;
+  final Function(double progress, int finalValue) onChanged; // Callback
 
-  const CircularProgressBar({
-    super.key,
-    required this.radius,
-    required this.strokeWidth,
-    required this.progressColor,
-    required this.arrowColor,
-    required this.progress,
-    required this.onChanged,
-    required this.startValue,
-    required this.endValue,
+  CreditCardWidget({
+    required this.minRange,
+    required this.maxRange,
+    required this.header,
+    required this.description,
+    required this.footer,
+    required this.onChanged, // Initialize callback function
   });
 
   @override
-  _CircularProgressBarState createState() => _CircularProgressBarState();
+  _CreditCardWidgetState createState() => _CreditCardWidgetState();
 }
 
-class _CircularProgressBarState extends State<CircularProgressBar> {
-  final double _startAngle = math.pi * 1.5;
-  double _currentAngle = math.pi * 1.5;
-  int finalValue = 0;
+class _CreditCardWidgetState extends State<CreditCardWidget> {
+  late double currentValue;
 
   @override
   void initState() {
     super.initState();
-    _currentAngle = widget.progress * 2 * math.pi + _startAngle;
-    finalValue = widget.startValue;
+    currentValue =
+        widget.minRange; // Initialize currentValue with the minRange value
+  }
+
+  // Method to update the current value and trigger the callback
+  void updateCurrentValue(double value) {
+    setState(() {
+      currentValue = value;
+    });
+    widget.onChanged(value, value.toInt()); // Trigger callback with both values
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      child: Stack(
-        children: [
-          ClipPath(
-            // Clip touchable area to progress arc and arrow shape
-            clipper: _CircularProgressBarClipper(
-              startAngle: _startAngle,
-              endAngle: _currentAngle,
-              strokeWidth: widget.strokeWidth,
-            ),
-            child: SizedBox(
-              width: widget.radius * 2,
-              height: widget.radius * 2,
-              child: CustomPaint(
-                painter: _CircularProgressBarPainter(
-                  startAngle: _startAngle,
-                  endAngle: _currentAngle,
-                  strokeWidth: widget.strokeWidth,
-                  progressColor: widget.progressColor,
-                  arrowColor: widget.arrowColor,
-                ),
-              ),
-            ),
-          ),
-          Positioned.fill(
-            child: Center(
-                child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CommonWidgets.FontWidget(
-                    StringConstants.creditAmount,
-                    Colors.white.withOpacity(0.7),
-                    FontWeight.w400,
-                    "Roboto",
-                    FontStyle.normal,
-                    60,
-                    TextAlign.left),
-                SizedBox(
-                  height: MediaQueryUtil.getValueInPixel(15),
-                ),
-                // CommonWidgets.FontWidget(NumberFormat.currency(locale: 'en_IN', symbol: '₹ ', decimalDigits: 0).format(finalValue), Colors.white, FontWeight.w700, "Inter", FontStyle.normal, 80, TextAlign.center)
-              ],
-            )),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 15,
+            offset: Offset(0, 4),
           ),
         ],
       ),
-      onPanStart: (details) {
-        _updateProgress(details.localPosition);
-      },
-      onPanUpdate: (details) {
-        _updateProgress(details.localPosition);
-      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Header Text
+            SizedBox(height: 10),
+            // Description Text
+            SizedBox(height: 20),
+            // Radial Gauge
+            SfRadialGauge(
+              axes: <RadialAxis>[
+                RadialAxis(
+                  minimum: widget.minRange,
+                  maximum: widget.maxRange,
+                  startAngle: 270,
+                  endAngle: 270,
+                  showLabels: false,
+                  showTicks: false,
+                  axisLineStyle: AxisLineStyle(
+                    cornerStyle: CornerStyle.bothFlat,
+                    color: Colors.black12,
+                    thickness: 15,
+                  ),
+                  pointers: <GaugePointer>[
+                    RangePointer(
+                      value: currentValue,
+                      cornerStyle: CornerStyle.bothFlat,
+                      width: 15,
+                      sizeUnit: GaugeSizeUnit.logicalPixel,
+                      color: Colors.orange,
+                    ),
+                    NeedlePointer(
+                      value: currentValue,
+                      needleColor: Colors.black,
+                      knobStyle: KnobStyle(
+                        color: Colors.white,
+                        borderColor: Colors.orange,
+                        borderWidth: 3,
+                      ),
+                    ),
+                  ],
+                  annotations: <GaugeAnnotation>[
+                    GaugeAnnotation(
+                      angle: 90,
+                      positionFactor: 0.1,
+                      widget: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            widget.header,
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text(
+                            '₹${currentValue.toInt()}',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            widget.description,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black.withOpacity(0.6),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            SizedBox(height: 10),
+            // Footer Text
+            Text(
+              widget.footer,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.black.withOpacity(0.6),
+              ),
+            ),
+            SizedBox(height: 20),
+            // Slider to change currentValue dynamically
+            Slider(
+              value: currentValue,
+              min: widget.minRange,
+              max: widget.maxRange,
+              onChanged: (value) {
+                updateCurrentValue(value);
+              },
+              activeColor: Colors.orange,
+              inactiveColor: Colors.black12,
+            ),
+          ],
+        ),
+      ),
     );
-  }
-
-  void _updateProgress(Offset localPosition) {
-    double dx = localPosition.dx - widget.radius;
-    double dy = localPosition.dy - widget.radius;
-    double angle = math.atan2(dy, dx);
-    if (angle < 0) {
-      angle += 2 * math.pi;
-    }
-    double initialAngle = widget.progress * 2 * math.pi + _startAngle;
-    if (angle > initialAngle) {
-      _currentAngle = angle;
-    } else {
-      _currentAngle = angle + 2 * math.pi;
-    }
-    setState(() {
-      double progress = (_currentAngle - _startAngle) / (2 * math.pi);
-
-      if (progress > 1.0) {
-        progress = 1.0;
-      }
-      finalValue =
-          (widget.startValue + (widget.endValue - widget.startValue) * progress)
-              .ceil();
-      widget.onChanged(progress, finalValue);
-    });
-  }
-}
-
-class _CircularProgressBarPainter extends CustomPainter {
-  final double startAngle;
-  final double endAngle;
-  final double strokeWidth;
-  final Color progressColor;
-  final Color arrowColor;
-
-  _CircularProgressBarPainter({
-    required this.startAngle,
-    required this.endAngle,
-    required this.strokeWidth,
-    required this.progressColor,
-    required this.arrowColor,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    Offset center = Offset(size.width / 2, size.height / 2);
-    double radius = size.width / 2 - strokeWidth / 2;
-
-    // Draw progress bar
-    Paint progressPaint = Paint()
-      ..color = progressColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth
-      ..strokeCap = StrokeCap.round;
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      startAngle,
-      endAngle - startAngle,
-      false,
-      progressPaint,
-    );
-
-    // Draw arrow
-    Offset arrowOffset = Offset(
-      center.dx + radius * math.cos(endAngle),
-      center.dy + radius * math.sin(endAngle),
-    );
-    Paint arrowPaint = Paint()..color = arrowColor;
-    double arrowRadius = strokeWidth / 2;
-    canvas.drawCircle(arrowOffset, arrowRadius, arrowPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
-  }
-}
-
-class _CircularProgressBarClipper extends CustomClipper<Path> {
-  final double startAngle;
-  final double endAngle;
-  final double strokeWidth;
-
-  _CircularProgressBarClipper({
-    required this.startAngle,
-    required this.endAngle,
-    required this.strokeWidth,
-  });
-
-  @override
-  Path getClip(Size size) {
-    Offset center = Offset(size.width / 2, size.height / 2);
-    double radius = size.width / 2 - strokeWidth / 2;
-
-    double startAngleRadians = startAngle;
-    double endAngleRadians = endAngle;
-
-    Path path = Path();
-    path.moveTo(center.dx, center.dy);
-    path.lineTo(center.dx + radius * math.cos(startAngleRadians),
-        center.dy + radius * math.sin(startAngleRadians));
-    path.arcTo(Rect.fromCircle(center: center, radius: radius),
-        startAngleRadians, endAngleRadians - startAngleRadians, false);
-    path.lineTo(center.dx, center.dy);
-
-    return path;
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) {
-    return true;
   }
 }

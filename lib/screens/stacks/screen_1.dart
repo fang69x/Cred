@@ -78,24 +78,29 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
         final claT = firstItem.ctaText;
         final openState = firstItem.openState!.body;
 
-        return Stack(
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _hudElement(),
-                ChangeNotifierProvider.value(
-                  value: provider,
-                  child: _stackPopupContent(openState!, claT!),
-                ),
-              ],
-            ),
-            ChangeNotifierProvider.value(
-              value: provider,
-              child: _openStackPopup(),
-            ),
-          ],
+        return Container(
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(131, 10, 45, 74),
+          ),
+          child: Stack(
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _hudElement(),
+                  ChangeNotifierProvider.value(
+                    value: provider,
+                    child: _stackPopupContent(openState!, claT!),
+                  ),
+                ],
+              ),
+              ChangeNotifierProvider.value(
+                value: provider,
+                child: _openStackPopup(),
+              ),
+            ],
+          ),
         );
       },
     );

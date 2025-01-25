@@ -138,7 +138,9 @@ class _CreditCardWidgetState extends State<CreditCardWidget> {
                                   widget.description,
                                   style: TextStyle(
                                     fontSize: screenWidth * 0.035,
-                                    color: Colors.black.withOpacity(0.6),
+                                    color:
+                                        const Color.fromARGB(255, 12, 118, 60)
+                                            .withOpacity(0.6),
                                   ),
                                   textAlign: TextAlign.center,
                                   overflow: TextOverflow.ellipsis,

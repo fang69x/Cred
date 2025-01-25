@@ -229,69 +229,50 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
         _reverseStackPopupAnim();
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16.0,
-          vertical: 20.0, // Added vertical padding for better spacing
-        ),
-        child: Column(
-          key: ValueKey('originalViewKey'
-              "${StackPopupModel.getCurrentStackPopupIndex()}"),
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: MediaQueryUtil.getValueInPixel(
-                      80), // Adjusted top spacing
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16.0,
+            vertical: 20.0, // Added vertical padding for better spacing
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: MediaQueryUtil.getValueInPixel(80)),
+              Text(
+                openState.title,
+                style: GoogleFonts.roboto(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: const Color.fromARGB(255, 114, 148, 164),
                 ),
-                Text(
-                  openState.title,
-                  style: GoogleFonts.roboto(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: const Color.fromARGB(
-                        255, 114, 148, 164), // Deep grey blue
-                  ),
+              ),
+              SizedBox(height: MediaQueryUtil.getDefaultHeightDim(12)),
+              Text(
+                openState.subtitle,
+                style: GoogleFonts.roboto(
+                  fontSize: 14,
+                  color: const Color.fromARGB(255, 55, 71, 79),
                 ),
-                SizedBox(
-                  height: MediaQueryUtil.getDefaultHeightDim(12),
-                ), // Spacing between title and subtitle
-                Text(
-                  openState.subtitle,
-                  style: GoogleFonts.roboto(
-                    fontSize: 14,
-                    color:
-                        const Color.fromARGB(255, 55, 71, 79), // Deep grey blue
-                  ),
-                ),
-              ],
-            ), // Top section
-            SizedBox(
-              height: MediaQueryUtil.getDefaultHeightDim(50),
-            ), // Spacing before EMIPlan
-            EMIPlan(
-              onEMIChange: onEMIPlanChange,
-              emiPlanItems: openState.items,
-              footer: openState.footer,
-            ),
-            SizedBox(
-              height: MediaQueryUtil.getDefaultHeightDim(550),
-            ),
-            CurvedEdgeButton(
-              onTap: () {
-                if (provider.getIsEmiClicked()) {
-                  return;
-                }
-                provider.setIsEmiClicked(true);
-              },
-              text: claT,
-              width: double.infinity,
-              textColor: Colors.white,
-            ),
-          ],
-        ),
-      ),
+              ),
+              SizedBox(height: MediaQueryUtil.getDefaultHeightDim(50)),
+              EMIPlan(
+                onEMIChange: onEMIPlanChange,
+                emiPlanItems: openState.items,
+                footer: openState.footer,
+              ),
+              SizedBox(height: MediaQueryUtil.getDefaultHeightDim(550)),
+              CurvedEdgeButton(
+                onTap: () {
+                  if (provider.getIsEmiClicked()) {
+                    return;
+                  }
+                  provider.setIsEmiClicked(true);
+                },
+                text: claT,
+                width: double.infinity,
+                textColor: Colors.white,
+              ),
+            ],
+          )),
     );
   }
 

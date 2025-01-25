@@ -153,7 +153,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
           child: Column(
             children: [
               SizedBox(
-                height: MediaQueryUtil.getValueInPixel(80),
+                height: MediaQueryUtil.getValueInPixel(50),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -191,7 +191,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
       children: [
         SizedBox(
           height: MediaQueryUtil.getPaddingTop() +
-              MediaQueryUtil.getValueInPixel(100),
+              MediaQueryUtil.getValueInPixel(50),
         ),
         Row(
           children: [

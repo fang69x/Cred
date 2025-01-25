@@ -1,13 +1,13 @@
 import 'package:cred/helperWidgets/circular_progress_bar.dart';
 import 'package:cred/helperWidgets/curved_edge_button.dart';
 import 'package:cred/models/api.model.dart';
+import 'package:cred/providers/data.provider.dart';
 import 'package:cred/service/api.service.dart';
 import 'package:cred/utils/common_widgets.dart';
 import 'package:cred/utils/media_query.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 import '../../providers/screen_1_provider.dart';
 
@@ -37,10 +37,12 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
   @override
   void initState() {
     StackPopupModel.incCurrentStackPopupIndex();
-    slideController =
-        AnimationController(vsync: this, duration: const Duration(seconds: 1));
-    slideAnimation =
-        Tween<double>(begin: 0.0, end: 0.78).animate(slideController);
+    slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    slideAnimation = Tween<double>(begin: 0.0, end: 0.78).animate(
+        CurvedAnimation(parent: slideController, curve: Curves.easeInOutSine));
     loanDataObj = LoanData();
     super.initState();
     futureApiResponse = Apiservice.fetchData();
@@ -55,46 +57,46 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<CredModel>(
-        future: futureApiResponse,
-        builder: (BuildContext context, AsyncSnapshot<CredModel> snapshot) {
-          {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            }
+    return Consumer<CredDataProvider>(
+      builder: (context, credDataProvider, child) {
+        if (credDataProvider.isLoading) {
+          return Center(child: CircularProgressIndicator());
+        }
 
-            if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            }
+        if (credDataProvider.error != null) {
+          return Center(child: Text('Error: ${credDataProvider.error}'));
+        }
 
-            if (!snapshot.hasData || snapshot.data!.items.isEmpty) {
-              return Center(child: Text('No data available'));
-            }
+        if (credDataProvider.credData == null ||
+            credDataProvider.credData!.items.isEmpty) {
+          return Center(child: Text('No data available'));
+        }
 
-            // Access API data directly
-            final firstItem = snapshot.data!.items[0];
-            final claT = firstItem.ctaText;
-            final openState = firstItem.openState!.body;
+        final firstItem = credDataProvider.credData!.items[0];
+        final claT = firstItem.ctaText;
+        final openState = firstItem.openState!.body;
 
-            return Stack(
+        return Stack(
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _hudElement(),
-                    //
-                    ChangeNotifierProvider.value(
-                        value: provider,
-                        child: _stackPopupContent(openState!, claT!)),
-                  ],
-                ),
+                _hudElement(),
                 ChangeNotifierProvider.value(
-                    value: provider, child: _openStackPopup()),
+                  value: provider,
+                  child: _stackPopupContent(openState!, claT!),
+                ),
               ],
-            );
-          }
-        });
+            ),
+            ChangeNotifierProvider.value(
+              value: provider,
+              child: _openStackPopup(),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget _stackPopupContent(OpenStateBody openState, String claT) {
@@ -253,7 +255,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
           Padding(
             padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
           ),
-          SizedBox(height: MediaQueryUtil.getDefaultHeightDim(50)),
+          SizedBox(height: MediaQueryUtil.getDefaultHeightDim(10)),
 
           CreditCardWidget(
             minRange: openState.card!.minRange.toDouble(),
@@ -267,8 +269,9 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
           ),
 
           Padding(
-            padding: const EdgeInsets.only(top: 40),
+            padding: const EdgeInsets.only(top: 10),
             child: CurvedEdgeButton(
+              width: double.infinity,
               text: claT,
               onTap: () {
                 if (provider.getIsEmiClicked()) {
@@ -288,7 +291,6 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
 
   List<Widget> _selectedAmountWidget() {
     List<Widget> li = [];
-    String selectedAmount = loanDataObj.getLoanAmount().toString();
 
     li.add(CommonWidgets.FontWidget(
         NumberFormat.currency(locale: 'en_IN', symbol: '₹ ', decimalDigits: 0)

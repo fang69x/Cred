@@ -8,7 +8,14 @@ import 'package:provider/provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SharedPreferences.getInstance();
-  runApp(const Cred());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => CredDataProvider()),
+      ],
+      child: const Cred(),
+    ),
+  );
 }
 
 class Cred extends StatelessWidget {
@@ -23,13 +30,10 @@ class Cred extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => DataProvider(),
-      child: MaterialApp(
-        initialRoute: initialRoute,
-        routes: routes,
-        debugShowCheckedModeBanner: false,
-      ),
+    return MaterialApp(
+      initialRoute: initialRoute,
+      routes: routes,
+      debugShowCheckedModeBanner: false,
     );
   }
 }

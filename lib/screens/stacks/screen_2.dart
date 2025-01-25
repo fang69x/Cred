@@ -1,5 +1,6 @@
 import 'package:cred/helperWidgets/curved_edge_button.dart';
 import 'package:cred/models/api.model.dart';
+import 'package:cred/providers/data.provider.dart';
 import 'package:cred/service/api.service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -35,8 +36,8 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
   @override
   void initState() {
     StackPopupModel.incCurrentStackPopupIndex();
-    slideController =
-        AnimationController(vsync: this, duration: const Duration(seconds: 1));
+    slideController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 300));
     slideAnimation =
         Tween<double>(begin: 0.0, end: 0.9).animate(slideController);
     super.initState();
@@ -68,38 +69,36 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<CredModel>(
-        future: futureApiResponse,
-        builder: (BuildContext context, AsyncSnapshot<CredModel> snapshot) {
-          {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            }
+    return Consumer<CredDataProvider>(
+      builder: (context, credDataProvider, child) {
+        if (credDataProvider.isLoading) {
+          return Center(child: CircularProgressIndicator());
+        }
 
-            if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            }
+        if (credDataProvider.error != null) {
+          return Center(child: Text('Error: ${credDataProvider.error}'));
+        }
 
-            if (!snapshot.hasData || snapshot.data!.items.isEmpty) {
-              return Center(child: Text('No data available'));
-            }
+        if (credDataProvider.credData == null ||
+            credDataProvider.credData!.items.isEmpty) {
+          return Center(child: Text('No data available'));
+        }
 
-            // Access API data directly
-            final secondItem = snapshot.data!.items[1];
+        final secondItem = credDataProvider.credData!.items[1];
 
-            final claT = secondItem.ctaText;
-            final openState = secondItem.openState!.body;
-            final closedState = secondItem.closedState!.body;
-            return Stack(
-              children: [
-                ChangeNotifierProvider.value(
-                  value: provider,
-                  child: _stackPopupContent(openState!, claT!, closedState!),
-                ),
-              ],
-            );
-          }
-        });
+        final claT = secondItem.ctaText;
+        final openState = secondItem.openState!.body;
+        final closedState = secondItem.closedState!.body;
+        return Stack(
+          children: [
+            ChangeNotifierProvider.value(
+              value: provider,
+              child: _stackPopupContent(openState!, claT!, closedState!),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   // Widget for the StackPopup content
@@ -168,7 +167,7 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
-                  width: MediaQueryUtil.getValueInPixel(100),
+                  width: MediaQueryUtil.getValueInPixel(50),
                 ),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -245,7 +244,9 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
                 ),
               ],
             ), // Top section
-            SizedBox(height: 20), // Spacing before EMIPlan
+            SizedBox(
+              height: MediaQueryUtil.getDefaultHeightDim(50),
+            ), // Spacing before EMIPlan
             EMIPlan(
               onEMIChange: onEMIPlanChange,
               emiPlanItems: openState.items,
@@ -262,8 +263,7 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
                 provider.setIsEmiClicked(true);
               },
               text: claT,
-              backgroundColor:
-                  const Color.fromARGB(255, 55, 71, 79), // Deep grey blue
+              width: double.infinity,
               textColor: Colors.white,
             ),
           ],

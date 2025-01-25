@@ -150,7 +150,7 @@ class BodyItem {
   final String? emi;
   final String? duration;
   final String? title;
-  final dynamic? subtitle;
+  final dynamic subtitle;
   final String? tag;
   final String? icon;
 

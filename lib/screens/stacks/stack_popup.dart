@@ -40,11 +40,6 @@ class _StackPopupState extends State<StackPopup> with TickerProviderStateMixin {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Align(
       alignment: Alignment.centerRight,
@@ -60,8 +55,9 @@ class _StackPopupState extends State<StackPopup> with TickerProviderStateMixin {
                 height: MediaQuery.of(context).size.height,
                 width: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
-                  color: Colors.black,
-                  border: Border.all(color: Colors.white, width: 0.5),
+                  color: const Color.fromARGB(131, 10, 45, 74),
+                  border: Border.all(
+                      color: const Color.fromARGB(255, 34, 11, 11), width: 0.5),
                   borderRadius: BorderRadius.only(
                     topLeft:
                         Radius.circular(MediaQueryUtil.getValueInPixel(100)),

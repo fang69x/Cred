@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cred/helperWidgets/curved_edge_button.dart';
 import 'package:cred/models/api.model.dart';
 import 'package:cred/providers/data.provider.dart';
@@ -101,7 +103,6 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
     );
   }
 
-  // Widget for the StackPopup content
   Widget _stackPopupContent(
       OpenStateBody openState, String claT, ClosedStateBody closedState) {
     return GestureDetector(
@@ -114,16 +115,14 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
             duration: const Duration(milliseconds: 300),
             child:
                 Consumer<Screen2Provider>(builder: (context, provider, child) {
-              // Display either _originalView or _stackPopupView based on state
               if (provider.getIsEmiClicked()) {
-                return _stackPopupView(closedState); // Show StackPopupView
+                return _stackPopupView(closedState);
               } else {
-                return _originalView(openState, claT); // Show Original View
+                return _originalView(openState, claT);
               }
             }),
           ),
           Consumer<Screen2Provider>(builder: (context, provider, child) {
-            // Only add StackPopup widget when EMI clicked is true
             if (provider.getIsEmiClicked()) {
               return StackPopup(
                 animCompleteCallback: _slideAnimCompleted,
@@ -134,14 +133,13 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
                 child: Screen3(handleBackButton: () {}, handleEMIPlan: () {}),
               );
             }
-            return const SizedBox(); // Empty placeholder
+            return const SizedBox();
           }),
         ],
       ),
     );
   }
 
-// Widget for the StackPopup view
   Widget _stackPopupView(ClosedStateBody closedState) {
     return Align(
       alignment: Alignment.centerRight,
@@ -150,48 +148,73 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
         key: ValueKey(
             'stackPopupKey' "${StackPopupModel.getCurrentStackPopupIndex()}"),
         decoration: BoxDecoration(
-          color: Colors.black,
+          color: const Color.fromARGB(
+              131, 10, 45, 74), // Match the previous color scheme
           border: Border.all(color: Colors.white, width: 0.5),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(MediaQueryUtil.getValueInPixel(100)),
             topRight: Radius.circular(MediaQueryUtil.getValueInPixel(100)),
           ),
-        ),
-        child: Column(
-          children: [
-            SizedBox(
-              height: MediaQueryUtil.getValueInPixel(80),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.4), // Shadow with opacity
+              offset: Offset(0, 4),
+              blurRadius: 8,
+              spreadRadius: 2,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
+          ],
+        ),
+        child: Stack(
+          children: [
+            // Apply the blur effect using ImageFilter from dart:ui
+            Positioned.fill(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaY: 1.0), // Adjust blur intensity
+                child: Container(
+                  decoration: BoxDecoration(
+                    color:
+                        Colors.black.withOpacity(0), // Transparent background
+                  ),
+                ),
+              ),
+            ),
+            Column(
               children: [
                 SizedBox(
-                  width: MediaQueryUtil.getValueInPixel(50),
+                  height: MediaQueryUtil.getValueInPixel(80),
                 ),
-                Column(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    SizedBox(
+                      width: MediaQueryUtil.getValueInPixel(50),
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _selectedAmountWidget(closedState),
-                        SizedBox(
-                          width: MediaQueryUtil.getDefaultWidthDim(500),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _selectedAmountWidget(closedState),
+                            SizedBox(
+                              width: MediaQueryUtil.getDefaultWidthDim(500),
+                            ),
+                            _durationWidget(),
+                          ],
                         ),
-                        _durationWidget(),
                       ],
-                    )
+                    ),
+                    const Expanded(
+                      child: SizedBox(),
+                    ),
+                    _getDropDownIcon(),
+                    SizedBox(
+                      width: MediaQueryUtil.getValueInPixel(70),
+                    ),
                   ],
                 ),
-                const Expanded(
-                  child: SizedBox(),
-                ),
-                _getDropDownIcon(),
-                SizedBox(
-                  width: MediaQueryUtil.getValueInPixel(70),
-                )
               ],
             ),
           ],
@@ -200,7 +223,6 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
     );
   }
 
-  // Widget for the original view before StackPopup
   Widget _originalView(OpenStateBody openState, String claT) {
     return GestureDetector(
       onTap: () {
@@ -220,15 +242,16 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
-                    height: MediaQueryUtil.getValueInPixel(
-                        80)), // Adjusted top spacing
+                  height: MediaQueryUtil.getValueInPixel(
+                      80), // Adjusted top spacing
+                ),
                 Text(
                   openState.title,
                   style: GoogleFonts.roboto(
-                    fontSize: 24,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color:
-                        const Color.fromARGB(255, 55, 71, 79), // Deep grey blue
+                    color: const Color.fromARGB(
+                        255, 114, 148, 164), // Deep grey blue
                   ),
                 ),
                 SizedBox(
@@ -237,7 +260,7 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
                 Text(
                   openState.subtitle,
                   style: GoogleFonts.roboto(
-                    fontSize: 16,
+                    fontSize: 14,
                     color:
                         const Color.fromARGB(255, 55, 71, 79), // Deep grey blue
                   ),
@@ -253,8 +276,8 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
               footer: openState.footer,
             ),
             SizedBox(
-              height: MediaQueryUtil.getDefaultHeightDim(500),
-            ), // Reduced spacing between EMIPlan and button
+              height: MediaQueryUtil.getDefaultHeightDim(550),
+            ),
             CurvedEdgeButton(
               onTap: () {
                 if (provider.getIsEmiClicked()) {
@@ -272,7 +295,6 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
     );
   }
 
-  // Widget for displaying selected EMI amount
   Widget _selectedAmountWidget(ClosedStateBody closedState) {
     List<Widget> li = [];
     li.add(CommonWidgets.FontWidget(

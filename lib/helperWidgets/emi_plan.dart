@@ -53,8 +53,10 @@ class _EMIPlanState extends State<EMIPlan> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12.0),
                     color: selectedPlanIndex == index
-                        ? Colors.green.shade400
-                        : Colors.grey.shade800,
+                        ? const Color.fromARGB(
+                            255, 144, 101, 36) // Amber/Gold for selected
+                        : const Color(
+                            0xFF1A1A2E), // Dark Indigo for not selected
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -120,7 +122,7 @@ class _EMIPlanState extends State<EMIPlan> {
                 },
                 style: ElevatedButton.styleFrom(
                   foregroundColor: Colors.white,
-                  backgroundColor: Colors.green, // Text color
+                  backgroundColor: const Color(0xFF1A1A2E), // Text color
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20.0,
                     vertical: 10.0,

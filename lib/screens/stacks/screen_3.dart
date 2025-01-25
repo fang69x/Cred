@@ -191,7 +191,8 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
               child: Container(
                 padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
                 decoration: BoxDecoration(
-                  color: Colors.blueAccent, // Button background color
+                  color: const Color.fromARGB(
+                      56, 78, 78, 78), // Button background color
                   borderRadius: BorderRadius.circular(16.0), // Rounded button
                 ),
                 child: Text(
@@ -204,10 +205,11 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
                 ),
               ),
             ),
-
+            SizedBox(height: MediaQueryUtil.getDefaultHeightDim(80)),
             // Curved Edge Button with callback
             CurvedEdgeButton(
               text: claT,
+              width: double.infinity,
               onTap: () {
                 // Add button logic here
               },

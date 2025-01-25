@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cred/helperWidgets/circular_progress_bar.dart';
 import 'package:cred/helperWidgets/curved_edge_button.dart';
 import 'package:cred/models/api.model.dart';
@@ -143,39 +145,65 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
           key: ValueKey(
               'stackPopupKey' "${StackPopupModel.getCurrentStackPopupIndex()}"),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.4),
+            color: const Color.fromARGB(131, 10, 45, 74),
             border: Border.all(color: Colors.white, width: 0.5),
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(MediaQueryUtil.getValueInPixel(100)),
               topRight: Radius.circular(MediaQueryUtil.getValueInPixel(100)),
             ),
-          ),
-          child: Column(
-            children: [
-              SizedBox(
-                height: MediaQueryUtil.getValueInPixel(50),
+            boxShadow: [
+              BoxShadow(
+                color:
+                    Colors.black.withOpacity(0.4), // Shadow color with opacity
+                offset: Offset(0, 4), // Shadow offset
+                blurRadius: 8, // Blur intensity
+                spreadRadius: 2, // Spread radius
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
+            ],
+          ),
+          child: Stack(
+            children: [
+              // Apply the blur effect
+              Positioned.fill(
+                child: BackdropFilter(
+                  filter:
+                      ImageFilter.blur(sigmaY: 0.8), // Adjust blur intensity
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black
+                          .withOpacity(0), // Make the background transparent
+                    ),
+                  ),
+                ),
+              ),
+              Column(
                 children: [
                   SizedBox(
-                    width: MediaQueryUtil.getValueInPixel(100),
+                    height: MediaQueryUtil.getValueInPixel(50),
                   ),
-                  Column(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ..._selectedAmountWidget(),
+                      SizedBox(
+                        width: MediaQueryUtil.getValueInPixel(100),
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ..._selectedAmountWidget(),
+                        ],
+                      ),
+                      const Expanded(
+                        child: SizedBox(),
+                      ),
+                      _getDropDownIcon(),
+                      SizedBox(
+                        width: MediaQueryUtil.getValueInPixel(70),
+                      ),
                     ],
                   ),
-                  const Expanded(
-                    child: SizedBox(),
-                  ),
-                  _getDropDownIcon(),
-                  SizedBox(
-                    width: MediaQueryUtil.getValueInPixel(70),
-                  )
                 ],
               ),
             ],
@@ -267,7 +295,9 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
               loanDataObj.setLoanAmount(finalValue);
             },
           ),
-
+          SizedBox(
+            height: MediaQueryUtil.getDefaultHeightDim(150),
+          ),
           Padding(
             padding: const EdgeInsets.only(top: 10),
             child: CurvedEdgeButton(

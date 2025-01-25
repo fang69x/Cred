@@ -169,7 +169,7 @@ class _CreditCardWidgetState extends State<CreditCardWidget> {
                 onChanged: (value) {
                   updateCurrentValue(value);
                 },
-                activeColor: Colors.orange,
+                activeColor: const Color.fromARGB(255, 144, 101, 36),
                 inactiveColor: Colors.black12,
               ),
             ],

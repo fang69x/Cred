@@ -24,7 +24,6 @@ class _IntroScreenState extends State<IntroScreen> {
         child: Screen1(
           handleBackButton:
               _handleBackButton, // Pass callback functions to Screen1
-          handleEMIPlan: _handleEMIPlan,
         ),
       ),
     );
@@ -33,10 +32,5 @@ class _IntroScreenState extends State<IntroScreen> {
   // Callback function to handle back button press
   void _handleBackButton() {
     Navigator.pop(context);
-  }
-
-  // Placeholder function for handling EMI plan
-  void _handleEMIPlan() {
-    // Implement your logic for handling EMI plan here
   }
 }

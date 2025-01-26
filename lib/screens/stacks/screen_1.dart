@@ -20,10 +20,8 @@ import 'stack_popup.dart';
 
 class Screen1 extends StatefulWidget {
   final Function handleBackButton;
-  final Function handleEMIPlan;
 
-  const Screen1(
-      {super.key, required this.handleBackButton, required this.handleEMIPlan});
+  const Screen1({super.key, required this.handleBackButton});
 
   @override
   _Screen1State createState() => _Screen1State();
@@ -313,7 +311,6 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
                   return;
                 }
                 provider.setIsEmiClicked(true);
-                widget.handleEMIPlan();
               },
             ),
           ),

@@ -47,6 +47,8 @@ class CurvedEdgeButton extends StatelessWidget {
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(calculatedCurveRadius),
           topRight: Radius.circular(calculatedCurveRadius),
+          bottomLeft: Radius.circular(calculatedCurveRadius),
+          bottomRight: Radius.circular(calculatedCurveRadius),
         ),
         child: Container(
           height: calculatedHeight,
@@ -65,7 +67,7 @@ class CurvedEdgeButton extends StatelessWidget {
           child: Center(
             child: Padding(
               padding: EdgeInsets.symmetric(
-                horizontal: screenWidth * 0.1,
+                horizontal: screenWidth * 0.2,
                 vertical: calculatedHeight * 0.2,
               ),
               child: Text(

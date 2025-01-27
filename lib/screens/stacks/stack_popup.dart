@@ -42,7 +42,7 @@ class _StackPopupState extends State<StackPopup> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: Alignment.centerRight,
+      alignment: Alignment.center,
       child: AnimatedBuilder(
         animation: widget.slideAnimation,
         builder: (context, child) {
@@ -57,7 +57,8 @@ class _StackPopupState extends State<StackPopup> with TickerProviderStateMixin {
                 decoration: BoxDecoration(
                   color: const Color.fromARGB(131, 10, 45, 74),
                   border: Border.all(
-                      color: const Color.fromARGB(255, 34, 11, 11), width: 0.5),
+                      color: const Color.fromARGB(255, 255, 255, 255),
+                      width: 0.5),
                   borderRadius: BorderRadius.only(
                     topLeft:
                         Radius.circular(MediaQueryUtil.getValueInPixel(100)),

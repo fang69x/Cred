@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../../constants/strings_constants.dart';
 import '../../helperWidgets/emi_plan.dart';
 import '../../models/emi_plan_model.dart';
 import '../../models/stack_popup.dart';
@@ -31,8 +30,8 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
   late Future<CredModel> futureApiResponse;
   EMIPlanModel selectedEMIPlan = EMIPlanModel(
       label: 'RECOMMENDED',
-      amount: '₹5,117',
-      duration: '24 months'); // default EMI plan
+      amount: '₹5,580',
+      duration: '9 months'); // default EMI plan
   Screen2Provider provider = Screen2Provider();
 
   @override
@@ -201,7 +200,7 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
                             SizedBox(
                               width: MediaQueryUtil.getDefaultWidthDim(500),
                             ),
-                            _durationWidget(),
+                            _durationWidget(closedState),
                           ],
                         ),
                       ],
@@ -301,10 +300,10 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
   }
 
   // Widget for displaying EMI duration
-  Widget _durationWidget() {
+  Widget _durationWidget(ClosedStateBody closedState) {
     List<Widget> li = [];
     li.add(CommonWidgets.FontWidget(
-        StringConstants.duration,
+        closedState.key2!,
         Colors.white.withOpacity(0.5),
         FontWeight.w400,
         "Inter",

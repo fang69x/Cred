@@ -279,7 +279,7 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
   Widget _selectedAmountWidget(ClosedStateBody closedState) {
     List<Widget> li = [];
     li.add(CommonWidgets.FontWidget(
-        StringConstants.emi,
+        closedState.key1!,
         Colors.white.withOpacity(0.5),
         FontWeight.w400,
         "Inter",

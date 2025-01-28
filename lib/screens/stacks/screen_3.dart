@@ -5,7 +5,6 @@ import 'package:cred/providers/data.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-
 import '../../utils/media_query.dart';
 import 'package:flutter/material.dart' as material;
 
@@ -24,6 +23,8 @@ class Screen3 extends StatefulWidget {
 class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
   late AnimationController slideController;
   late Animation<double> slideAnimation;
+  final ValueNotifier<int?> selectedTileIndex = ValueNotifier<int?>(null);
+  final Color primaryColor = const Color(0xFF4A90E2); // Primary brand color
 
   @override
   void initState() {
@@ -38,6 +39,7 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
   @override
   void dispose() {
     slideController.dispose();
+    selectedTileIndex.dispose();
     StackPopupModel.decCurrentStackPopupIndex();
     super.dispose();
   }
@@ -47,24 +49,25 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
     return Consumer<CredDataProvider>(
         builder: (context, credDataProvider, child) {
       if (credDataProvider.isLoading) {
-        return Center(child: CircularProgressIndicator());
+        return _buildLoadingState();
       }
       if (credDataProvider.error != null) {
-        return Center(child: Text('Error : ${credDataProvider.error}'));
+        return _buildErrorState(credDataProvider.error!);
       }
       if (credDataProvider.credData == null ||
           credDataProvider.credData!.items.isEmpty) {
-        return Center(child: Text('No data available'));
+        return _buildEmptyState();
       }
+
       final thirdItem = credDataProvider.credData!.items[2];
-      final claT = thirdItem.ctaText;
+      final ctaText = thirdItem.ctaText;
       final openState = thirdItem.openState!.body;
 
       return Stack(
         children: [
           Column(
             children: [
-              originalView(openState!, claT!),
+              _buildMainContent(openState!, ctaText!),
             ],
           ),
         ],
@@ -72,150 +75,222 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
     });
   }
 
-  Widget originalView(OpenStateBody openState, String claT) {
-    ValueNotifier<int?> selectedTileIndex = ValueNotifier<int?>(null);
-
+  Widget _buildMainContent(OpenStateBody openState, String ctaText) {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
         child: Column(
-          key: ValueKey('originalViewKey'
-              "${StackPopupModel.getCurrentStackPopupIndex()}"),
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title
-            Text(
-              openState.title,
-              style: GoogleFonts.roboto(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color:
-                    const Color.fromARGB(255, 114, 148, 164), // Deep grey blue
-              ),
-            ),
-            SizedBox(height: MediaQueryUtil.getValueInPixel(20)),
-
-            // Subtitle
-            Text(
-              openState.subtitle,
-              style: GoogleFonts.roboto(
-                fontSize: 14,
-                color: const Color.fromARGB(141, 106, 117, 122), // Light grey
-              ),
-            ),
-            SizedBox(height: MediaQueryUtil.getValueInPixel(20)),
-
-            // Elevated ListTiles with Checkbox for selection
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight:
-                    MediaQuery.of(context).size.height * 0.5, // Limit height
-              ),
-              child: ListView.builder(
-                shrinkWrap:
-                    true, // Ensure the ListView doesn't take infinite height
-                physics:
-                    NeverScrollableScrollPhysics(), // Disable scrolling here
-                itemCount: openState.items.length, // Number of tiles
-                itemBuilder: (context, index) {
-                  final bank = openState.items[index];
-                  final bankName = bank.title;
-                  return ValueListenableBuilder<int?>(
-                    valueListenable: selectedTileIndex,
-                    builder: (context, selectedIndex, child) {
-                      bool isSelected = selectedIndex == index;
-                      return // Updated Card Widget
-                          material.Card(
-                        elevation: 4, // Reduced elevation for subtlety
-                        margin: const EdgeInsets.symmetric(vertical: 8.0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
-                        color: const Color.fromARGB(115, 158, 116,
-                            255), // Changed to white for better contrast
-                        shadowColor:
-                            Colors.grey.withOpacity(0.5), // Softer shadow
-                        child: ListTile(
-                          leading: Icon(
-                            Icons.food_bank_outlined,
-                            color: isSelected ? Colors.blueAccent : Colors.grey,
-                          ),
-                          title: Text(
-                            bankName!,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color:
-                                  isSelected ? Colors.blueAccent : Colors.black,
-                            ),
-                          ),
-                          subtitle: Text(
-                            bank.subtitle.toString(),
-                            style: TextStyle(
-                              color: isSelected
-                                  ? Colors.blueAccent[700]
-                                  : Colors.black54,
-                            ),
-                          ),
-                          tileColor: isSelected
-                              ? Colors.blueAccent.withOpacity(0.1)
-                              : Colors.transparent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          trailing: Checkbox(
-                            value: isSelected,
-                            onChanged: (bool? value) {
-                              selectedTileIndex.value =
-                                  value! ? index : null; // Toggle selection
-                            },
-                          ),
-                          onTap: () {
-                            selectedTileIndex.value =
-                                isSelected ? null : index; // Toggle selection
-                          },
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-
-            SizedBox(height: MediaQueryUtil.getDefaultHeightDim(20)),
-
-            // Footer Button
-            GestureDetector(
-              onTap: () {
-                // Handle footer button tap if needed
-              },
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(
-                      56, 78, 78, 78), // Button background color
-                  borderRadius: BorderRadius.circular(16.0), // Rounded button
-                ),
-                child: Text(
-                  openState.footer,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: MediaQueryUtil.getDefaultHeightDim(80)),
-            // Curved Edge Button with callback
+            _buildHeader(openState),
+            const SizedBox(height: 24),
+            _buildBankList(openState),
+            const SizedBox(height: 24),
+            _buildFooter(openState),
+            const SizedBox(height: 40),
             CurvedEdgeButton(
-              text: claT,
+              text: ctaText,
               width: double.infinity,
-              onTap: () {
-                // Add button logic here
-              },
+              backgroundColor: primaryColor,
+              textColor: Colors.white,
+              onTap: () => widget.handleEMIPlan(),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(OpenStateBody openState) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          openState.title,
+          style: GoogleFonts.roboto(
+            fontWeight: FontWeight.w700,
+            fontSize: 20,
+            color: Colors.grey[800],
+            letterSpacing: -0.5,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          openState.subtitle,
+          style: GoogleFonts.roboto(
+            fontSize: 15,
+            color: Colors.grey[600],
+            height: 1.4,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBankList(OpenStateBody openState) {
+    return Material(
+      elevation: 2,
+      borderRadius: BorderRadius.circular(16),
+      color: Colors.white,
+      child: ListView.separated(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: openState.items.length,
+        separatorBuilder: (context, index) => Divider(
+          height: 1,
+          color: Colors.grey[200],
+          indent: 16,
+          endIndent: 16,
+        ),
+        itemBuilder: (context, index) {
+          final bank = openState.items[index];
+          return ValueListenableBuilder<int?>(
+            valueListenable: selectedTileIndex,
+            builder: (context, selectedIndex, child) {
+              final isSelected = selectedIndex == index;
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                decoration: BoxDecoration(
+                  color: isSelected ? primaryColor.withOpacity(0.05) : null,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.account_balance,
+                      color: primaryColor,
+                      size: 24,
+                    ),
+                  ),
+                  title: Text(
+                    bank.title!,
+                    style: GoogleFonts.roboto(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[800],
+                      fontSize: 16,
+                    ),
+                  ),
+                  subtitle: Text(
+                    bank.subtitle.toString(),
+                    style: GoogleFonts.roboto(
+                      color: Colors.grey[600],
+                      fontSize: 14,
+                    ),
+                  ),
+                  trailing: Checkbox(
+                    value: isSelected,
+                    onChanged: (value) =>
+                        selectedTileIndex.value = value! ? index : null,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    activeColor: primaryColor,
+                  ),
+                  onTap: () =>
+                      selectedTileIndex.value = isSelected ? null : index,
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildFooter(OpenStateBody openState) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey[200]!),
+      ),
+      child: Text(
+        openState.footer,
+        textAlign: TextAlign.center,
+        style: GoogleFonts.roboto(
+          color: Colors.grey[600],
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingState() {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CircularProgressIndicator(color: primaryColor),
+          const SizedBox(height: 16),
+          Text(
+            'Loading options...',
+            style: GoogleFonts.roboto(
+              color: Colors.grey[600],
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState(String error) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.error_outline, color: Colors.red[300], size: 48),
+          const SizedBox(height: 16),
+          Text(
+            'Failed to load data',
+            style: GoogleFonts.roboto(
+              color: Colors.grey[800],
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            error,
+            style: GoogleFonts.roboto(
+              color: Colors.grey[600],
+              fontSize: 14,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.hourglass_empty, color: Colors.grey[400], size: 48),
+          const SizedBox(height: 16),
+          Text(
+            'No payment options available',
+            style: GoogleFonts.roboto(
+              color: Colors.grey[800],
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,18 +1,16 @@
 import 'dart:ui';
-
 import 'package:cred/helperWidgets/curved_edge_button.dart';
+import 'package:cred/helperWidgets/emi_plan.dart';
+import 'package:cred/helperWidgets/glass_panel.dart';
 import 'package:cred/models/api.model.dart';
 import 'package:cred/providers/data.provider.dart';
+import 'package:cred/providers/screen_provider.dart';
 import 'package:cred/service/api.service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../../helperWidgets/emi_plan.dart';
 import '../../models/emi_plan_model.dart';
 import '../../models/stack_popup.dart';
-import '../../providers/screen_2_provider.dart';
-import '../../utils/common_widgets.dart';
 import '../../utils/media_query.dart';
 import 'screen_3.dart';
 import 'stack_popup.dart';
@@ -29,18 +27,18 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
   late Animation<double> slideAnimation;
   late Future<CredModel> futureApiResponse;
   EMIPlanModel selectedEMIPlan = EMIPlanModel(
-      label: 'RECOMMENDED',
-      amount: '₹5,580',
-      duration: '9 months'); // default EMI plan
-  Screen2Provider provider = Screen2Provider();
+      label: 'RECOMMENDED', amount: '₹5,580', duration: '9 months');
+  ScreenProvider provider = ScreenProvider();
 
   @override
   void initState() {
     StackPopupModel.incCurrentStackPopupIndex();
     slideController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 300));
-    slideAnimation =
-        Tween<double>(begin: 0.0, end: 0.9).animate(slideController);
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    slideAnimation = Tween<double>(begin: 0.0, end: 0.78).animate(
+        CurvedAnimation(parent: slideController, curve: Curves.easeOutCubic));
     super.initState();
     futureApiResponse = Apiservice.fetchData();
   }
@@ -52,20 +50,14 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  void onEMIPlanChange(EMIPlanModel emi) {
-    selectedEMIPlan = emi;
-  }
+  void onEMIPlanChange(EMIPlanModel emi) => selectedEMIPlan = emi;
 
   void _slideAnimCompleted() {}
 
-  void _slideAnimReversed() {
-    provider.setIsEmiClicked(false);
-  }
+  void _slideAnimReversed() => provider.setIsEmiClicked(false);
 
   void _reverseStackPopupAnim() {
-    if (provider.getIsEmiClicked()) {
-      slideController.reverse();
-    }
+    if (provider.getIsEmiClicked()) slideController.reverse();
   }
 
   @override
@@ -73,148 +65,186 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
     return Consumer<CredDataProvider>(
       builder: (context, credDataProvider, child) {
         if (credDataProvider.isLoading) {
-          return Center(child: CircularProgressIndicator());
+          return Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation(Colors.white.withOpacity(0.8)),
+            ),
+          );
         }
 
         if (credDataProvider.error != null) {
-          return Center(child: Text('Error: ${credDataProvider.error}'));
+          return _buildErrorState(credDataProvider.error!);
         }
 
         if (credDataProvider.credData == null ||
             credDataProvider.credData!.items.isEmpty) {
-          return Center(child: Text('No data available'));
+          return _buildEmptyState();
         }
 
         final secondItem = credDataProvider.credData!.items[1];
-
         final claT = secondItem.ctaText;
         final openState = secondItem.openState!.body;
         final closedState = secondItem.closedState!.body;
-        return Stack(
-          children: [
-            ChangeNotifierProvider.value(
-              value: provider,
-              child: _stackPopupContent(openState!, claT!, closedState!),
+
+        return Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                const Color(0xFF0A2F4D),
+                const Color(0xFF1A1A2E).withOpacity(0.9),
+              ],
             ),
-          ],
+          ),
+          child: Stack(
+            children: [
+              _buildBackgroundElements(),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ChangeNotifierProvider.value(
+                    value: provider,
+                    child: _stackPopupContent(openState!, claT!, closedState!),
+                  ),
+                ],
+              ),
+              ChangeNotifierProvider.value(
+                value: provider,
+                child: _openStackPopup(closedState!),
+              ),
+            ],
+          ),
         );
       },
     );
   }
 
-  Widget _stackPopupContent(
-      OpenStateBody openState, String claT, ClosedStateBody closedState) {
-    return GestureDetector(
-      onTap: () {
-        _reverseStackPopupAnim();
-      },
-      child: Stack(
+  Widget _buildErrorState(String error) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            child:
-                Consumer<Screen2Provider>(builder: (context, provider, child) {
-              if (provider.getIsEmiClicked()) {
-                return _stackPopupView(closedState);
-              } else {
-                return _originalView(openState, claT);
-              }
-            }),
+          Icon(Icons.error_outline,
+              color: Colors.white.withOpacity(0.8), size: 40),
+          const SizedBox(height: 16),
+          Text(
+            'Failed to load data',
+            style: GoogleFonts.roboto(
+              color: Colors.white.withOpacity(0.9),
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
           ),
-          Consumer<Screen2Provider>(builder: (context, provider, child) {
-            if (provider.getIsEmiClicked()) {
-              return StackPopup(
-                animCompleteCallback: _slideAnimCompleted,
-                animReversedCallBack: _slideAnimReversed,
-                slideController: slideController,
-                slideAnimation: slideAnimation,
-                screenNumber: 1,
-                child: Screen3(handleBackButton: () {}, handleEMIPlan: () {}),
-              );
-            }
-            return const SizedBox();
-          }),
+          const SizedBox(height: 8),
+          Text(
+            error,
+            style: GoogleFonts.roboto(
+              color: Colors.white.withOpacity(0.7),
+              fontSize: 14,
+            ),
+            textAlign: TextAlign.center,
+          ),
         ],
       ),
     );
   }
 
-  Widget _stackPopupView(ClosedStateBody closedState) {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: Container(
-        width: MediaQueryUtil.safeWidth,
-        key: ValueKey(
-            'stackPopupKey' "${StackPopupModel.getCurrentStackPopupIndex()}"),
-        decoration: BoxDecoration(
-          color: const Color.fromARGB(
-              131, 10, 45, 74), // Match the previous color scheme
-          border: Border.all(color: Colors.white, width: 0.5),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(MediaQueryUtil.getValueInPixel(100)),
-            topRight: Radius.circular(MediaQueryUtil.getValueInPixel(100)),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.4), // Shadow with opacity
-              offset: Offset(0, 4),
-              blurRadius: 8,
-              spreadRadius: 2,
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.hourglass_empty,
+              color: Colors.white.withOpacity(0.8), size: 40),
+          const SizedBox(height: 16),
+          Text(
+            'No data available',
+            style: GoogleFonts.roboto(
+              color: Colors.white.withOpacity(0.9),
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
             ),
-          ],
-        ),
-        child: Stack(
-          children: [
-            // Apply the blur effect using ImageFilter from dart:ui
-            Positioned.fill(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaY: 1.0), // Adjust blur intensity
-                child: Container(
-                  decoration: BoxDecoration(
-                    color:
-                        Colors.black.withOpacity(0), // Transparent background
-                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBackgroundElements() {
+    return Positioned.fill(
+      child: Column(
+        children: [
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.blueAccent.withOpacity(0.1),
+                    Colors.purpleAccent.withOpacity(0.05),
+                  ],
                 ),
               ),
             ),
-            Column(
-              children: [
-                SizedBox(
-                  height: MediaQueryUtil.getValueInPixel(80),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: MediaQueryUtil.getValueInPixel(50),
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            _selectedAmountWidget(closedState),
-                            SizedBox(
-                              width: MediaQueryUtil.getDefaultWidthDim(500),
-                            ),
-                            _durationWidget(closedState),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const Expanded(
-                      child: SizedBox(),
-                    ),
-                    _getDropDownIcon(),
-                    SizedBox(
-                      width: MediaQueryUtil.getValueInPixel(70),
-                    ),
-                  ],
-                ),
-              ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _stackPopupContent(
+      OpenStateBody openState, String claT, ClosedStateBody closedState) {
+    return Stack(
+      children: [
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          child: Consumer<ScreenProvider>(builder: (context, provider, child) {
+            return provider.getIsEmiClicked()
+                ? _stackPopupView(closedState)
+                : _originalView(openState, claT);
+          }),
+        ),
+      ],
+    );
+  }
+
+  Widget _openStackPopup(ClosedStateBody closedState) {
+    return Consumer<ScreenProvider>(builder: (context, provider, child) {
+      return provider.getIsEmiClicked()
+          ? StackPopup(
+              animCompleteCallback: _slideAnimCompleted,
+              animReversedCallBack: _slideAnimReversed,
+              slideController: slideController,
+              slideAnimation: slideAnimation,
+              screenNumber: 2,
+              child: Screen3(handleBackButton: () {}, handleEMIPlan: () {}),
+            )
+          : const SizedBox();
+    });
+  }
+
+  Widget _stackPopupView(ClosedStateBody closedState) {
+    return GestureDetector(
+      onTap: _reverseStackPopupAnim,
+      child: FrostedGlassPanel(
+        height: MediaQueryUtil.safeHeight * 0.8,
+        child: Column(
+          children: [
+            const SizedBox(height: 40),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _selectedAmountWidget(closedState),
+                  _durationWidget(closedState),
+                  _buildControlIcons(),
+                ],
+              ),
             ),
           ],
         ),
@@ -224,113 +254,130 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
 
   Widget _originalView(OpenStateBody openState, String claT) {
     return GestureDetector(
-      onTap: () {
-        _reverseStackPopupAnim();
-      },
+      onTap: _reverseStackPopupAnim,
       child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16.0,
-            vertical: 20.0, // Added vertical padding for better spacing
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          key: ValueKey(
+              'originalViewKey${StackPopupModel.getCurrentStackPopupIndex()}'),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeaderSection(openState),
+            const SizedBox(height: 40),
+            EMIPlan(
+              onEMIChange: onEMIPlanChange,
+              emiPlanItems: openState.items,
+              footer: openState.footer,
+            ),
+            const SizedBox(height: 40),
+            _buildActionButton(claT),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeaderSection(OpenStateBody openState) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          openState.title,
+          style: GoogleFonts.roboto(
+            color: Colors.white,
+            fontSize: 28,
+            fontWeight: FontWeight.w700,
+            height: 1.2,
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: MediaQueryUtil.getValueInPixel(80)),
-              Text(
-                openState.title,
-                style: GoogleFonts.roboto(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: const Color.fromARGB(255, 114, 148, 164),
-                ),
-              ),
-              SizedBox(height: MediaQueryUtil.getDefaultHeightDim(12)),
-              Text(
-                openState.subtitle,
-                style: GoogleFonts.roboto(
-                  fontSize: 14,
-                  color: const Color.fromARGB(255, 55, 71, 79),
-                ),
-              ),
-              SizedBox(height: MediaQueryUtil.getDefaultHeightDim(50)),
-              EMIPlan(
-                onEMIChange: onEMIPlanChange,
-                emiPlanItems: openState.items,
-                footer: openState.footer,
-              ),
-              SizedBox(height: MediaQueryUtil.getDefaultHeightDim(550)),
-              CurvedEdgeButton(
-                onTap: () {
-                  if (provider.getIsEmiClicked()) {
-                    return;
-                  }
-                  provider.setIsEmiClicked(true);
-                },
-                text: claT,
-                width: double.infinity,
-                textColor: Colors.white,
-              ),
-            ],
-          )),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          openState.subtitle,
+          style: GoogleFonts.roboto(
+            color: Colors.white.withOpacity(0.8),
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionButton(String claT) {
+    return CurvedEdgeButton(
+      width: double.infinity,
+      text: claT,
+      onTap: () {
+        if (provider.getIsEmiClicked()) return;
+        provider.setIsEmiClicked(true);
+      },
     );
   }
 
   Widget _selectedAmountWidget(ClosedStateBody closedState) {
-    List<Widget> li = [];
-    li.add(CommonWidgets.FontWidget(
-        closedState.key1!,
-        Colors.white.withOpacity(0.5),
-        FontWeight.w400,
-        "Inter",
-        FontStyle.normal,
-        60,
-        TextAlign.left));
-    li.add(CommonWidgets.FontWidget(
-        selectedEMIPlan.amount,
-        Colors.white.withOpacity(0.7),
-        FontWeight.w500,
-        "Inter",
-        FontStyle.normal,
-        70,
-        TextAlign.left));
-
     return Column(
-      children: [...li],
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          closedState.key1!,
+          style: GoogleFonts.roboto(
+            color: Colors.white.withOpacity(0.5),
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+        const SizedBox(height: 8),
+        ShaderMask(
+          shaderCallback: (bounds) => LinearGradient(
+            colors: [Colors.blueAccent, Colors.purpleAccent],
+          ).createShader(bounds),
+          child: Text(
+            selectedEMIPlan.amount,
+            style: GoogleFonts.roboto(
+              fontSize: 36,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
-  // Widget for displaying EMI duration
   Widget _durationWidget(ClosedStateBody closedState) {
-    List<Widget> li = [];
-    li.add(CommonWidgets.FontWidget(
-        closedState.key2!,
-        Colors.white.withOpacity(0.5),
-        FontWeight.w400,
-        "Inter",
-        FontStyle.normal,
-        60,
-        TextAlign.left));
-    li.add(CommonWidgets.FontWidget(
-        selectedEMIPlan.duration,
-        Colors.white.withOpacity(0.7),
-        FontWeight.w500,
-        "Inter",
-        FontStyle.normal,
-        70,
-        TextAlign.left));
-
     return Column(
-      children: [...li],
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          closedState.key2!,
+          style: GoogleFonts.roboto(
+            color: Colors.white.withOpacity(0.5),
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          selectedEMIPlan.duration,
+          style: GoogleFonts.roboto(
+            color: Colors.white.withOpacity(0.7),
+            fontSize: 24,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
     );
   }
 
-  // Widget for displaying dropdown icon
-  Widget _getDropDownIcon() {
-    return const Icon(
-      Icons.arrow_downward,
-      color: Colors.white,
+  Widget _buildControlIcons() {
+    return Row(
+      children: [
+        IconButton(
+          icon: Icon(Icons.keyboard_arrow_down_rounded,
+              color: Colors.white.withOpacity(0.8)),
+          onPressed: _reverseStackPopupAnim,
+        ),
+      ],
     );
   }
-
-  void reverseStackPopupAnim() {}
 }

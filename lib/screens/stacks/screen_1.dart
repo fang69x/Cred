@@ -1,18 +1,16 @@
 import 'dart:ui';
-
 import 'package:cred/helperWidgets/circular_progress_bar.dart';
 import 'package:cred/helperWidgets/curved_edge_button.dart';
+import 'package:cred/helperWidgets/glass_panel.dart';
 import 'package:cred/models/api.model.dart';
 import 'package:cred/providers/data.provider.dart';
 import 'package:cred/service/api.service.dart';
-import 'package:cred/utils/common_widgets.dart';
 import 'package:cred/utils/media_query.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
-import '../../providers/screen_1_provider.dart';
-
+import '../../providers/screen_provider.dart';
 import '../../models/loan_data.dart';
 import '../../models/stack_popup.dart';
 import 'screen_2.dart';
@@ -30,7 +28,7 @@ class Screen1 extends StatefulWidget {
 class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
   late AnimationController slideController;
   late Animation<double> slideAnimation;
-  Screen1Provider provider = Screen1Provider();
+  ScreenProvider provider = ScreenProvider();
   late LoanData loanDataObj;
   late Future<CredModel> futureApiResponse;
 
@@ -39,10 +37,10 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
     StackPopupModel.incCurrentStackPopupIndex();
     slideController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 400),
     );
     slideAnimation = Tween<double>(begin: 0.0, end: 0.78).animate(
-        CurvedAnimation(parent: slideController, curve: Curves.easeInOutSine));
+        CurvedAnimation(parent: slideController, curve: Curves.easeOutCubic));
     loanDataObj = LoanData();
     super.initState();
     futureApiResponse = Apiservice.fetchData();
@@ -60,16 +58,21 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
     return Consumer<CredDataProvider>(
       builder: (context, credDataProvider, child) {
         if (credDataProvider.isLoading) {
-          return Center(child: CircularProgressIndicator());
+          return Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation(Colors.white.withOpacity(0.8)),
+            ),
+          );
         }
 
         if (credDataProvider.error != null) {
-          return Center(child: Text('Error: ${credDataProvider.error}'));
+          return _buildErrorState(credDataProvider.error!);
         }
 
         if (credDataProvider.credData == null ||
             credDataProvider.credData!.items.isEmpty) {
-          return Center(child: Text('No data available'));
+          return _buildEmptyState();
         }
 
         final firstItem = credDataProvider.credData!.items[0];
@@ -78,10 +81,18 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
 
         return Container(
           decoration: BoxDecoration(
-            color: const Color.fromARGB(131, 10, 45, 74),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                const Color(0xFF0A2F4D),
+                const Color(0xFF1A1A2E).withOpacity(0.9),
+              ],
+            ),
           ),
           child: Stack(
             children: [
+              _buildBackgroundElements(),
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,12 +115,88 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
     );
   }
 
+  Widget _buildErrorState(String error) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.error_outline,
+              color: Colors.white.withOpacity(0.8), size: 40),
+          const SizedBox(height: 16),
+          Text(
+            'Failed to load data',
+            style: GoogleFonts.roboto(
+              color: Colors.white.withOpacity(0.9),
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            error,
+            style: GoogleFonts.roboto(
+              color: Colors.white.withOpacity(0.7),
+              fontSize: 14,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.hourglass_empty,
+              color: Colors.white.withOpacity(0.8), size: 40),
+          const SizedBox(height: 16),
+          Text(
+            'No data available',
+            style: GoogleFonts.roboto(
+              color: Colors.white.withOpacity(0.9),
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBackgroundElements() {
+    return Positioned.fill(
+      child: Column(
+        children: [
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.blueAccent.withOpacity(0.1),
+                    Colors.purpleAccent.withOpacity(0.05),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _stackPopupContent(OpenStateBody openState, String claT) {
     return Stack(
       children: [
         AnimatedSwitcher(
-          duration: const Duration(milliseconds: 100),
-          child: Consumer<Screen1Provider>(builder: (context, provider, child) {
+          duration: const Duration(milliseconds: 200),
+          switchInCurve: Curves.easeOut,
+          switchOutCurve: Curves.easeIn,
+          child: Consumer<ScreenProvider>(builder: (context, provider, child) {
             return provider.getIsEmiClicked()
                 ? _stackPopupView(openState)
                 : _originalView(openState, claT);
@@ -120,7 +207,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
   }
 
   Widget _openStackPopup() {
-    return Consumer<Screen1Provider>(builder: (context, provider, child) {
+    return Consumer<ScreenProvider>(builder: (context, provider, child) {
       return provider.getIsEmiClicked()
           ? StackPopup(
               animCompleteCallback: _slideAnimCompleted,
@@ -134,80 +221,25 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
     });
   }
 
-  /// View when stack is open
   Widget _stackPopupView(OpenStateBody openState) {
     return GestureDetector(
-      onTap: () {
-        _reverseStackPopupAnim();
-      },
+      onTap: _reverseStackPopupAnim,
       child: Align(
         alignment: Alignment.centerRight,
-        child: Container(
+        child: FrostedGlassPanel(
           height: MediaQueryUtil.safeHeight * 0.8,
-          width: MediaQueryUtil.safeWidth,
-          key: ValueKey(
-              'stackPopupKey' "${StackPopupModel.getCurrentStackPopupIndex()}"),
-          decoration: BoxDecoration(
-            color: const Color.fromARGB(131, 10, 45, 74),
-            border: Border.all(color: Colors.white, width: 0.5),
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(MediaQueryUtil.getValueInPixel(100)),
-              topRight: Radius.circular(MediaQueryUtil.getValueInPixel(100)),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color:
-                    Colors.black.withOpacity(0.4), // Shadow color with opacity
-                offset: Offset(0, 4), // Shadow offset
-                blurRadius: 8, // Blur intensity
-                spreadRadius: 2, // Spread radius
-              ),
-            ],
-          ),
-          child: Stack(
+          child: Column(
             children: [
-              // Apply the blur effect
-              Positioned.fill(
-                child: BackdropFilter(
-                  filter:
-                      ImageFilter.blur(sigmaY: 0.8), // Adjust blur intensity
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black
-                          .withOpacity(0), // Make the background transparent
-                    ),
-                  ),
+              const SizedBox(height: 40),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildLoanAmountDisplay(),
+                    _buildControlIcons(),
+                  ],
                 ),
-              ),
-              Column(
-                children: [
-                  SizedBox(
-                    height: MediaQueryUtil.getValueInPixel(50),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        width: MediaQueryUtil.getValueInPixel(100),
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ..._selectedAmountWidget(),
-                        ],
-                      ),
-                      const Expanded(
-                        child: SizedBox(),
-                      ),
-                      _getDropDownIcon(),
-                      SizedBox(
-                        width: MediaQueryUtil.getValueInPixel(70),
-                      ),
-                    ],
-                  ),
-                ],
               ),
             ],
           ),
@@ -216,138 +248,142 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
     );
   }
 
-  /// Hud element like back button and FAQ
   Widget _hudElement() {
-    return Column(
-      children: [
-        SizedBox(
-          height: MediaQueryUtil.getPaddingTop() +
-              MediaQueryUtil.getValueInPixel(50),
-        ),
-        Row(
-          children: [
-            SizedBox(width: MediaQueryUtil.getValueInPixel(100)),
-            GestureDetector(
-              onTap: () {
-                widget.handleBackButton();
-              },
-              child: CommonWidgets.getBackButtonWidget(),
-            ),
-            const Expanded(child: SizedBox()),
-            _getFAQIcon(),
-            SizedBox(
-              width: MediaQueryUtil.getValueInPixel(100),
-            ),
-          ],
-        ),
-        SizedBox(
-          height: MediaQueryUtil.getValueInPixel(200),
-        ),
-      ],
-    );
-  }
-
-  /// Widget when stack is not visisble
-  Widget _originalView(OpenStateBody openState, String claT) {
-    return GestureDetector(
-      onTap: () {
-        _reverseStackPopupAnim();
-      },
-      child: Column(
-        key: ValueKey(
-            'originalViewKey${StackPopupModel.getCurrentStackPopupIndex()}'),
+    return Padding(
+      padding: EdgeInsets.only(
+        top: MediaQueryUtil.getPaddingTop() + 24,
+        left: 24,
+        right: 24,
+      ),
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Title and Subtitle
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  openState.title,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  openState.subtitle,
-                  style: TextStyle(
-                    color: const Color.fromARGB(255, 117, 117, 117),
-                    fontSize: 16,
-                  ),
-                ),
-              ],
-            ),
+          IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                color: Colors.white),
+            onPressed: () => widget.handleBackButton(),
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
-          ),
-          SizedBox(height: MediaQueryUtil.getDefaultHeightDim(10)),
-
-          CreditCardWidget(
-            minRange: openState.card!.minRange.toDouble(),
-            maxRange: openState.card!.maxRange.toDouble(),
-            header: openState.card!.header,
-            footer: openState.footer,
-            description: openState.card!.description,
-            onChanged: (double progress, int finalValue) {
-              loanDataObj.setLoanAmount(finalValue);
-            },
-          ),
-          SizedBox(
-            height: MediaQueryUtil.getDefaultHeightDim(150),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: CurvedEdgeButton(
-              width: double.infinity,
-              text: claT,
-              onTap: () {
-                if (provider.getIsEmiClicked()) {
-                  return;
-                }
-                provider.setIsEmiClicked(true);
-              },
-            ),
+          IconButton(
+            icon: const Icon(Icons.help_outline_rounded, color: Colors.white),
+            onPressed: () {},
           ),
         ],
       ),
     );
   }
 
-  /// Helpers widget
-
-  List<Widget> _selectedAmountWidget() {
-    List<Widget> li = [];
-
-    li.add(CommonWidgets.FontWidget(
-        NumberFormat.currency(locale: 'en_IN', symbol: '₹ ', decimalDigits: 0)
-            .format(loanDataObj.getLoanAmount()),
-        Colors.white.withOpacity(0.6),
-        FontWeight.w400,
-        "Roboto",
-        FontStyle.normal,
-        60,
-        TextAlign.center));
-
-    return li;
-  }
-
-  Widget _getFAQIcon() {
-    return const Icon(
-      Icons.add_comment_outlined,
-      color: Colors.white,
+  Widget _originalView(OpenStateBody openState, String claT) {
+    return GestureDetector(
+      onTap: _reverseStackPopupAnim,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          key: ValueKey(
+              'originalViewKey${StackPopupModel.getCurrentStackPopupIndex()}'),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeaderSection(openState),
+            const SizedBox(height: 40),
+            _buildCreditCardWidget(openState),
+            const SizedBox(height: 40),
+            _buildActionButton(claT),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _getDropDownIcon() {
-    return const Icon(
-      Icons.arrow_downward,
-      color: Colors.white,
+  Widget _buildHeaderSection(OpenStateBody openState) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          openState.title,
+          style: GoogleFonts.roboto(
+            color: Colors.white,
+            fontSize: 28,
+            fontWeight: FontWeight.w700,
+            height: 1.2,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          openState.subtitle,
+          style: GoogleFonts.roboto(
+            color: Colors.white.withOpacity(0.8),
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCreditCardWidget(OpenStateBody openState) {
+    return CreditCardWidget(
+      minRange: openState.card!.minRange.toDouble(),
+      maxRange: openState.card!.maxRange.toDouble(),
+      header: openState.card!.header,
+      footer: openState.footer,
+      description: openState.card!.description,
+      onChanged: (double progress, int finalValue) {
+        loanDataObj.setLoanAmount(finalValue);
+      },
+    );
+  }
+
+  Widget _buildActionButton(String claT) {
+    return CurvedEdgeButton(
+      width: double.infinity,
+      text: claT,
+      onTap: () {
+        if (provider.getIsEmiClicked()) return;
+        provider.setIsEmiClicked(true);
+      },
+    );
+  }
+
+  Widget _buildLoanAmountDisplay() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Loan Amount',
+          style: GoogleFonts.roboto(
+            color: Colors.white.withOpacity(0.8),
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 8),
+        ShaderMask(
+          shaderCallback: (bounds) => LinearGradient(
+            colors: [Colors.blueAccent, Colors.purpleAccent],
+          ).createShader(bounds),
+          child: Text(
+            NumberFormat.currency(
+                    locale: 'en_IN', symbol: '₹ ', decimalDigits: 0)
+                .format(loanDataObj.getLoanAmount()),
+            style: GoogleFonts.roboto(
+              fontSize: 36,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildControlIcons() {
+    return Row(
+      children: [
+        IconButton(
+          icon: Icon(Icons.keyboard_arrow_down_rounded,
+              color: Colors.white.withOpacity(0.8)),
+          onPressed: _reverseStackPopupAnim,
+        ),
+      ],
     );
   }
 

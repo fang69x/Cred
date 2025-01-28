@@ -37,8 +37,8 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
       vsync: this,
       duration: const Duration(milliseconds: 400),
     );
-    slideAnimation = Tween<double>(begin: 0.0, end: 0.78).animate(
-        CurvedAnimation(parent: slideController, curve: Curves.easeOutCubic));
+    slideAnimation = Tween<double>(begin: 0.0, end: 0.9).animate(
+        CurvedAnimation(parent: slideController, curve: Curves.easeOut));
     super.initState();
     futureApiResponse = Apiservice.fetchData();
   }
@@ -50,7 +50,8 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  void onEMIPlanChange(EMIPlanModel emi) => selectedEMIPlan = emi;
+  void onEMIPlanChange(EMIPlanModel emi) =>
+      setState(() => selectedEMIPlan = emi);
 
   void _slideAnimCompleted() {}
 
@@ -102,8 +103,6 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
             children: [
               _buildBackgroundElements(),
               Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ChangeNotifierProvider.value(
                     value: provider,
@@ -113,7 +112,7 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
               ),
               ChangeNotifierProvider.value(
                 value: provider,
-                child: _openStackPopup(closedState!),
+                child: _openStackPopup(closedState),
               ),
             ],
           ),
@@ -199,6 +198,7 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
   Widget _stackPopupContent(
       OpenStateBody openState, String claT, ClosedStateBody closedState) {
     return Stack(
+      alignment: Alignment.topCenter,
       children: [
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
@@ -221,7 +221,11 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
               slideController: slideController,
               slideAnimation: slideAnimation,
               screenNumber: 2,
-              child: Screen3(handleBackButton: () {}, handleEMIPlan: () {}),
+              child: Screen3(
+                  handleBackButton: () {
+                    Navigator.pop(context);
+                  },
+                  handleEMIPlan: () {}),
             )
           : const SizedBox();
     });
@@ -231,12 +235,11 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
     return GestureDetector(
       onTap: _reverseStackPopupAnim,
       child: FrostedGlassPanel(
-        height: MediaQueryUtil.safeHeight * 0.8,
+        height: MediaQueryUtil.safeHeight,
         child: Column(
           children: [
-            const SizedBox(height: 40),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 5),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -262,6 +265,7 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
               'originalViewKey${StackPopupModel.getCurrentStackPopupIndex()}'),
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(height: 40),
             _buildHeaderSection(openState),
             const SizedBox(height: 40),
             EMIPlan(

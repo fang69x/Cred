@@ -78,7 +78,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
         final firstItem = credDataProvider.credData!.items[0];
         final claT = firstItem.ctaText;
         final openState = firstItem.openState!.body;
-
+        final closedState = firstItem.closedState!.body;
         return Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -100,7 +100,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
                   _hudElement(),
                   ChangeNotifierProvider.value(
                     value: provider,
-                    child: _stackPopupContent(openState!, claT!),
+                    child: _stackPopupContent(openState!, claT!, closedState!),
                   ),
                 ],
               ),
@@ -189,7 +189,8 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
     );
   }
 
-  Widget _stackPopupContent(OpenStateBody openState, String claT) {
+  Widget _stackPopupContent(
+      OpenStateBody openState, String claT, ClosedStateBody closedState) {
     return Stack(
       children: [
         AnimatedSwitcher(
@@ -198,7 +199,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
           switchOutCurve: Curves.easeIn,
           child: Consumer<ScreenProvider>(builder: (context, provider, child) {
             return provider.getIsEmiClicked()
-                ? _stackPopupView(openState)
+                ? _stackPopupView(openState, closedState)
                 : _originalView(openState, claT);
           }),
         ),
@@ -221,7 +222,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
     });
   }
 
-  Widget _stackPopupView(OpenStateBody openState) {
+  Widget _stackPopupView(OpenStateBody openState, ClosedStateBody closedState) {
     return GestureDetector(
       onTap: _reverseStackPopupAnim,
       child: Align(
@@ -230,13 +231,13 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
           height: MediaQueryUtil.safeHeight * 0.8,
           child: Column(
             children: [
-              const SizedBox(height: 40),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildLoanAmountDisplay(),
+                    _buildLoanAmountDisplay(closedState),
                     _buildControlIcons(),
                   ],
                 ),
@@ -343,12 +344,12 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildLoanAmountDisplay() {
+  Widget _buildLoanAmountDisplay(ClosedStateBody closedState) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Loan Amount',
+          closedState.key1!,
           style: GoogleFonts.roboto(
             color: Colors.white.withOpacity(0.8),
             fontSize: 16,

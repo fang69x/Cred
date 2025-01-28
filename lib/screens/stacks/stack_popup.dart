@@ -70,7 +70,8 @@ class _StackPopupState extends State<StackPopup> with TickerProviderStateMixin {
             offset: Offset(
               0.0,
               MediaQuery.of(context).size.height *
-                  (1 - widget.slideAnimation.value * 1),
+                  0.9 *
+                  (1 - widget.slideAnimation.value),
             ),
             child: Transform.scale(
               scale: _scaleAnimation.value,
@@ -124,27 +125,8 @@ class _StackPopupState extends State<StackPopup> with TickerProviderStateMixin {
                 width: 0.75,
               ),
             ),
-            child: Column(
-              children: [
-                _buildHandleIndicator(),
-                Expanded(child: widget.child),
-              ],
-            ),
+            child: Expanded(child: widget.child),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHandleIndicator() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Container(
-        width: 48,
-        height: 4,
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.3),
-          borderRadius: BorderRadius.circular(2),
         ),
       ),
     );

@@ -1,20 +1,21 @@
 import 'package:cred/helperWidgets/curved_edge_button.dart';
 import 'package:cred/models/api.model.dart';
+import 'package:cred/models/emi_plan_model.dart';
 import 'package:cred/models/stack_popup.dart';
 import 'package:cred/providers/data.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../../utils/media_query.dart';
-import 'package:flutter/material.dart' as material;
 
 class Screen3 extends StatefulWidget {
   final Function handleBackButton;
   final Function handleEMIPlan;
 
-  const Screen3(
-      {Key? key, required this.handleBackButton, required this.handleEMIPlan})
-      : super(key: key);
+  const Screen3({
+    Key? key,
+    required this.handleBackButton,
+    required this.handleEMIPlan,
+  }) : super(key: key);
 
   @override
   _Screen3State createState() => _Screen3State();

@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 import '../models/emi_plan_model.dart';
 import '../utils/common_widgets.dart';
 import '../utils/media_query.dart';
-import '../models/api.model.dart'; // Import the API model
+import '../models/api.model.dart';
 
 class EMIPlan extends StatefulWidget {
   final Function onEMIChange;
-  final List<BodyItem> emiPlanItems; // Pass API data
+  final List<BodyItem> emiPlanItems;
   final String footer;
+
   const EMIPlan({
     super.key,
     required this.onEMIChange,
     required this.emiPlanItems,
-    required this.footer, // Constructor update
+    required this.footer,
   });
 
   @override
@@ -25,123 +26,238 @@ class _EMIPlanState extends State<EMIPlan> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         SizedBox(
-          height: MediaQueryUtil.getDefaultHeightDim(600),
+          height: MediaQueryUtil.getDefaultHeightDim(800),
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: widget.emiPlanItems.length,
             itemBuilder: (context, index) {
               final plan = widget.emiPlanItems[index];
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selectedPlanIndex = index;
-                    widget.onEMIChange(EMIPlanModel(
-                      label: plan.tag ?? '',
-                      amount: plan.emi ?? '',
-                      duration: plan.duration ?? '',
-                    ));
-                  });
-                },
-                child: Container(
-                  width: MediaQueryUtil.getDefaultWidthDim(700),
-                  margin: const EdgeInsets.symmetric(horizontal: 8.0),
-                  padding: const EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12.0),
-                    color: selectedPlanIndex == index
-                        ? const Color.fromARGB(
-                            255, 144, 101, 36) // Amber/Gold for selected
-                        : const Color(
-                            0xFF1A1A2E), // Dark Indigo for not selected
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (plan.tag != null && plan.tag!.isNotEmpty)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0,
-                            vertical: 4.0,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.amber,
-                            borderRadius: BorderRadius.circular(4.0),
-                          ),
-                          child: CommonWidgets.FontWidget(
-                            plan.tag!,
-                            Colors.black,
-                            FontWeight.w600,
-                            "Inter",
-                            FontStyle.normal,
-                            40,
-                            TextAlign.left,
+              final isSelected = selectedPlanIndex == index;
+
+              return AnimatedScale(
+                duration: const Duration(milliseconds: 300),
+                scale: isSelected ? 1.05 : 1.0,
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedPlanIndex = index;
+                      widget.onEMIChange(EMIPlanModel(
+                        label: plan.tag ?? '',
+                        amount: plan.emi ?? '',
+                        duration: plan.duration ?? '',
+                      ));
+                    });
+                  },
+                  child: Container(
+                    width: MediaQueryUtil.getDefaultWidthDim(720),
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 12.0, vertical: 8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      gradient: LinearGradient(
+                        colors: isSelected
+                            ? [const Color(0xFFFDB631), const Color(0xFF947D4E)]
+                            : [
+                                const Color(0xFF2A2A4A),
+                                const Color(0xFF1A1A2E)
+                              ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                      border: isSelected
+                          ? null
+                          : Border.all(
+                              color: Colors.white.withOpacity(0.1), width: 1),
+                    ),
+                    child: Stack(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              if (plan.tag != null && plan.tag!.isNotEmpty)
+                                _buildTag(plan.tag!),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  CommonWidgets.FontWidget(
+                                    plan.title ?? 'N/A',
+                                    Colors.white,
+                                    FontWeight.w800,
+                                    "Inter",
+                                    FontStyle.normal,
+                                    90,
+                                    TextAlign.left,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  CommonWidgets.FontWidget(
+                                    plan.subtitle ?? 'N/A',
+                                    Colors.white.withOpacity(0.9),
+                                    FontWeight.w500,
+                                    "Inter",
+                                    FontStyle.normal,
+                                    65,
+                                    TextAlign.left,
+                                  ),
+                                ],
+                              ),
+                              _buildPlanDetails(plan),
+                            ],
                           ),
                         ),
-                      SizedBox(height: 16.0),
-                      CommonWidgets.FontWidget(
-                        plan.title ?? 'N/A',
-                        Colors.white,
-                        FontWeight.bold,
-                        "Inter",
-                        FontStyle.normal,
-                        80,
-                        TextAlign.left,
-                      ),
-                      SizedBox(height: 16.0),
-                      CommonWidgets.FontWidget(
-                        plan.subtitle ?? 'N/A',
-                        Colors.white,
-                        FontWeight.normal,
-                        "Inter",
-                        FontStyle.normal,
-                        60,
-                        TextAlign.left,
-                      ),
-                    ],
+                        if (isSelected)
+                          Positioned(
+                            right: 20,
+                            top: 20,
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.check_rounded,
+                                color: Color(0xFFFDB631),
+                                size: 24,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               );
             },
           ),
         ),
-        SizedBox(height: MediaQueryUtil.getDefaultHeightDim(50)),
-        Padding(
-          padding: const EdgeInsets.only(left: 10.0),
+        const SizedBox(height: 20),
+        _buildFooterButton(),
+      ],
+    );
+  }
+
+  Widget _buildTag(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: CommonWidgets.FontWidget(
+        text,
+        const Color(0xFF1A1A2E),
+        FontWeight.w600,
+        "Inter",
+        FontStyle.normal,
+        38,
+        TextAlign.left,
+      ),
+    );
+  }
+
+  Widget _buildPlanDetails(BodyItem plan) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            _buildDetailItem("EMI", plan.emi ?? 'N/A'),
+            const SizedBox(width: 20),
+            _buildDetailItem("Duration", plan.duration ?? 'N/A'),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDetailItem(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CommonWidgets.FontWidget(
+          label,
+          Colors.white.withOpacity(0.7),
+          FontWeight.w500,
+          "Inter",
+          FontStyle.normal,
+          35,
+          TextAlign.left,
+        ),
+        CommonWidgets.FontWidget(
+          value,
+          Colors.white,
+          FontWeight.w700,
+          "Inter",
+          FontStyle.normal,
+          45,
+          TextAlign.left,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFooterButton() {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        margin: const EdgeInsets.symmetric(horizontal: 20),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFFFDB631), Color(0xFF947D4E)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: ElevatedButton(
+          onPressed: () => debugPrint("Footer button clicked!"),
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+            backgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+          ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              ElevatedButton(
-                onPressed: () {
-                  // Action to perform when the footer button is clicked
-                  debugPrint("Footer button clicked!");
-                },
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: const Color(0xFF1A1A2E), // Text color
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20.0,
-                    vertical: 10.0,
-                  ),
-                ),
-                child: CommonWidgets.FontWidget(
-                  widget.footer,
-                  Colors.white,
-                  FontWeight.w400,
-                  "Inter",
-                  FontStyle.normal,
-                  40,
-                  TextAlign.center,
-                ),
+              CommonWidgets.FontWidget(
+                widget.footer,
+                Colors.white,
+                FontWeight.w600,
+                "Inter",
+                FontStyle.normal,
+                45,
+                TextAlign.center,
               ),
+              const SizedBox(width: 12),
+              const Icon(Icons.arrow_forward_rounded,
+                  color: Colors.white, size: 24),
             ],
           ),
         ),
-      ],
+      ),
     );
   }
 }

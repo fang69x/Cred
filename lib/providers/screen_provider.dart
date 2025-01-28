@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class Screen2Provider extends ChangeNotifier{
+class ScreenProvider extends ChangeNotifier {
   bool isEMIButtonClicked = false;
 
   bool getIsEmiClicked() {

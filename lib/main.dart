@@ -1,4 +1,5 @@
 import 'package:cred/providers/data.provider.dart';
+import 'package:cred/providers/stack_manager.dart';
 import 'package:cred/screens/home.screen.dart';
 import 'package:cred/screens/intro_screen.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => CredDataProvider()),
+        ChangeNotifierProvider(create: (_) => StackManager())
       ],
       child: const Cred(),
     ),

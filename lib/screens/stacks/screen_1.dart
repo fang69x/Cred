@@ -85,22 +85,27 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                const Color(0xFF0A2F4D),
-                const Color(0xFF1A1A2E).withOpacity(0.9),
+                Color(0xFF0F3460),
+                Color(0xFF16213E),
+                Color(0xFF1A1A2E),
               ],
+              stops: [0.1, 0.5, 0.9],
             ),
           ),
           child: Stack(
             children: [
-              _buildBackgroundElements(),
+              _buildAnimatedBackground(),
               Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                // This Column now has proper children
                 children: [
                   _hudElement(),
-                  ChangeNotifierProvider.value(
-                    value: provider,
-                    child: _stackPopupContent(openState!, claT!, closedState!),
+                  Expanded(
+                    // Add this to make the content take remaining space
+                    child: ChangeNotifierProvider.value(
+                      value: provider,
+                      child:
+                          _stackPopupContent(openState!, claT!, closedState!),
+                    ),
                   ),
                 ],
               ),
@@ -166,44 +171,51 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildBackgroundElements() {
-    return Positioned.fill(
-      child: Column(
-        children: [
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.blueAccent.withOpacity(0.1),
-                    Colors.purpleAccent.withOpacity(0.05),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
+  Widget _buildAnimatedBackground() {
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 800),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF0F3460).withOpacity(0.8),
+            Color(0xFF16213E).withOpacity(0.6),
+            Color(0xFF1A1A2E).withOpacity(0.4),
+          ],
+        ),
       ),
+      // child: Container(
+      //   decoration: BoxDecoration(
+      //     image: DecorationImage(
+      //       image: AssetImage('assets/images/subtle_texture.png'),
+      //       fit: BoxFit.cover,
+      //       opacity: 0.1,
+      //     ),
+      //   ),
+      // ),
     );
   }
 
   Widget _stackPopupContent(
       OpenStateBody openState, String claT, ClosedStateBody closedState) {
-    return Stack(
-      children: [
-        AnimatedSwitcher(
-          duration: const Duration(milliseconds: 200),
-          switchInCurve: Curves.easeOut,
-          switchOutCurve: Curves.easeIn,
-          child: Consumer<ScreenProvider>(builder: (context, provider, child) {
-            return provider.getIsEmiClicked()
-                ? _stackPopupView(openState, closedState)
-                : _originalView(openState, claT);
-          }),
-        ),
-      ],
+    return Expanded(
+      // Add this to take remaining space
+      child: Stack(
+        children: [
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            switchInCurve: Curves.easeOut,
+            switchOutCurve: Curves.easeIn,
+            child:
+                Consumer<ScreenProvider>(builder: (context, provider, child) {
+              return provider.getIsEmiClicked()
+                  ? _stackPopupView(openState, closedState)
+                  : _originalView(openState, claT);
+            }),
+          ),
+        ],
+      ),
     );
   }
 
@@ -225,26 +237,31 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
   Widget _stackPopupView(OpenStateBody openState, ClosedStateBody closedState) {
     return GestureDetector(
       onTap: _reverseStackPopupAnim,
-      child: Align(
-        alignment: Alignment.centerRight,
-        child: FrostedGlassPanel(
-          height: MediaQueryUtil.safeHeight * 0.8,
-          child: Column(
-            children: [
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _buildLoanAmountDisplay(closedState),
-                    _buildControlIcons(),
-                  ],
-                ),
+      child: Column(
+        // Add Column here
+        children: [
+          Expanded(
+            // Now Expanded is properly inside Column
+            child: FrostedGlassPanel(
+              height: MediaQueryUtil.safeHeight * 0.9,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildLoanAmountDisplay(closedState),
+                        _buildControlIcons(),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -276,14 +293,15 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
   Widget _originalView(OpenStateBody openState, String claT) {
     return GestureDetector(
       onTap: _reverseStackPopupAnim,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: SafeArea(
         child: Column(
           key: ValueKey(
               'originalViewKey${StackPopupModel.getCurrentStackPopupIndex()}'),
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeaderSection(openState),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: _buildHeaderSection(openState),
+            ),
             const SizedBox(height: 40),
             _buildCreditCardWidget(openState),
             const SizedBox(height: 40),
@@ -298,22 +316,32 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          openState.title,
-          style: GoogleFonts.roboto(
-            color: Colors.white,
-            fontSize: 28,
-            fontWeight: FontWeight.w700,
-            height: 1.2,
+        AnimatedSwitcher(
+          duration: Duration(milliseconds: 300),
+          child: Text(
+            openState.title,
+            key: ValueKey(openState.title),
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+              fontSize: 32,
+              fontWeight: FontWeight.w700,
+              height: 1.2,
+              letterSpacing: -0.5,
+            ),
           ),
         ),
-        const SizedBox(height: 12),
-        Text(
-          openState.subtitle,
-          style: GoogleFonts.roboto(
-            color: Colors.white.withOpacity(0.8),
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
+        SizedBox(height: 16),
+        AnimatedOpacity(
+          duration: Duration(milliseconds: 500),
+          opacity: 1,
+          child: Text(
+            openState.subtitle,
+            style: GoogleFonts.poppins(
+              color: Colors.white.withOpacity(0.85),
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              height: 1.4,
+            ),
           ),
         ),
       ],
@@ -335,7 +363,6 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
 
   Widget _buildActionButton(String claT) {
     return CurvedEdgeButton(
-      width: double.infinity,
       text: claT,
       onTap: () {
         if (provider.getIsEmiClicked()) return;

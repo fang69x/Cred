@@ -110,22 +110,29 @@ class _StackPopupState extends State<StackPopup> with TickerProviderStateMixin {
         ),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  const Color(0xFF0A2F4D).withOpacity(0.9),
-                  const Color(0xFF1A1A2E).withOpacity(0.95),
-                ],
+          child: Column(
+            children: [
+              Expanded(
+                // Moved Expanded here
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        const Color(0xFF0A2F4D).withOpacity(0.9),
+                        const Color(0xFF1A1A2E).withOpacity(0.95),
+                      ],
+                    ),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.15),
+                      width: 0.75,
+                    ),
+                  ),
+                  child: widget.child,
+                ),
               ),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.15),
-                width: 0.75,
-              ),
-            ),
-            child: Expanded(child: widget.child),
+            ],
           ),
         ),
       ),

@@ -26,6 +26,7 @@ class _EMIPlanState extends State<EMIPlan> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
           height: MediaQueryUtil.getDefaultHeightDim(800),
@@ -209,53 +210,47 @@ class _EMIPlanState extends State<EMIPlan> {
   }
 
   Widget _buildFooterButton() {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        margin: const EdgeInsets.symmetric(horizontal: 20),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFFFDB631), Color(0xFF947D4E)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
-          borderRadius: BorderRadius.circular(30),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
+        ],
+      ),
+      child: ElevatedButton(
+        onPressed: () => debugPrint("Footer button clicked!"),
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          backgroundColor: Colors.transparent, // Transparent background
+          shadowColor: Colors.transparent, // No shadow from the button itself
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+            side:
+                const BorderSide(color: Colors.white, width: 2), // White border
+          ),
         ),
-        child: ElevatedButton(
-          onPressed: () => debugPrint("Footer button clicked!"),
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-            backgroundColor: Colors.transparent,
-            shadowColor: Colors.transparent,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CommonWidgets.FontWidget(
+              widget.footer,
+              Colors.white,
+              FontWeight.w600,
+              "Inter",
+              FontStyle.normal,
+              45,
+              TextAlign.center,
             ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CommonWidgets.FontWidget(
-                widget.footer,
-                Colors.white,
-                FontWeight.w600,
-                "Inter",
-                FontStyle.normal,
-                45,
-                TextAlign.center,
-              ),
-              const SizedBox(width: 12),
-              const Icon(Icons.arrow_forward_rounded,
-                  color: Colors.white, size: 24),
-            ],
-          ),
+            const SizedBox(width: 12),
+            const Icon(Icons.arrow_forward_rounded,
+                color: Colors.white, size: 24),
+          ],
         ),
       ),
     );

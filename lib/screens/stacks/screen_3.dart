@@ -1,11 +1,11 @@
-import 'package:cred/helperWidgets/curved_edge_button.dart';
-import 'package:cred/models/api.model.dart';
-import 'package:cred/models/emi_plan_model.dart';
-import 'package:cred/models/stack_popup.dart';
-import 'package:cred/providers/data.provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'dart:ui';
+import 'package:cred/helperWidgets/curved_edge_button.dart';
+import 'package:cred/models/api.model.dart';
+import 'package:cred/models/stack_popup.dart';
+import 'package:cred/providers/data.provider.dart';
 
 class Screen3 extends StatefulWidget {
   final Function handleBackButton;
@@ -25,7 +25,6 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
   late AnimationController slideController;
   late Animation<double> slideAnimation;
   final ValueNotifier<int?> selectedTileIndex = ValueNotifier<int?>(null);
-  final Color primaryColor = const Color(0xFF4A90E2); // Primary brand color
 
   @override
   void initState() {
@@ -47,53 +46,78 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<CredDataProvider>(
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            const Color(0xFF0A2F4D),
+            const Color(0xFF1A1A2E).withOpacity(0.9),
+          ],
+        ),
+      ),
+      child: Consumer<CredDataProvider>(
         builder: (context, credDataProvider, child) {
-      if (credDataProvider.isLoading) {
-        return _buildLoadingState();
-      }
-      if (credDataProvider.error != null) {
-        return _buildErrorState(credDataProvider.error!);
-      }
-      if (credDataProvider.credData == null ||
-          credDataProvider.credData!.items.isEmpty) {
-        return _buildEmptyState();
-      }
+          if (credDataProvider.isLoading) {
+            return _buildLoadingState();
+          }
+          if (credDataProvider.error != null) {
+            return _buildErrorState(credDataProvider.error!);
+          }
+          if (credDataProvider.credData == null ||
+              credDataProvider.credData!.items.isEmpty) {
+            return _buildEmptyState();
+          }
 
-      final thirdItem = credDataProvider.credData!.items[2];
-      final ctaText = thirdItem.ctaText;
-      final openState = thirdItem.openState!.body;
+          final thirdItem = credDataProvider.credData!.items[2];
+          final ctaText = thirdItem.ctaText;
+          final openState = thirdItem.openState!.body;
 
-      return Stack(
-        children: [
-          Column(
+          return Stack(
             children: [
+              _buildBackgroundElements(),
               _buildMainContent(openState!, ctaText!),
             ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildBackgroundElements() {
+    return Positioned.fill(
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.blueAccent.withOpacity(0.1),
+              Colors.purpleAccent.withOpacity(0.05),
+            ],
           ),
-        ],
-      );
-    });
+        ),
+      ),
+    );
   }
 
   Widget _buildMainContent(OpenStateBody openState, String ctaText) {
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeader(openState),
-            const SizedBox(height: 24),
+            const SizedBox(height: 10),
             _buildBankList(openState),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             _buildFooter(openState),
             const SizedBox(height: 40),
             CurvedEdgeButton(
               text: ctaText,
               width: double.infinity,
-              backgroundColor: primaryColor,
-              textColor: Colors.white,
               onTap: () => widget.handleEMIPlan(),
             ),
           ],
@@ -108,19 +132,21 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
       children: [
         Text(
           openState.title,
-          style: GoogleFonts.roboto(
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontSize: 18,
             fontWeight: FontWeight.w700,
-            fontSize: 20,
-            color: Colors.grey[800],
+            height: 1.2,
             letterSpacing: -0.5,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 5),
         Text(
           openState.subtitle,
-          style: GoogleFonts.roboto(
-            fontSize: 15,
-            color: Colors.grey[600],
+          style: GoogleFonts.poppins(
+            color: Colors.white.withOpacity(0.8),
+            fontSize: 12,
+            fontWeight: FontWeight.w400,
             height: 1.4,
           ),
         ),
@@ -129,80 +155,109 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
   }
 
   Widget _buildBankList(OpenStateBody openState) {
-    return Material(
-      elevation: 2,
+    return ClipRRect(
       borderRadius: BorderRadius.circular(16),
-      color: Colors.white,
-      child: ListView.separated(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: openState.items.length,
-        separatorBuilder: (context, index) => Divider(
-          height: 1,
-          color: Colors.grey[200],
-          indent: 16,
-          endIndent: 16,
-        ),
-        itemBuilder: (context, index) {
-          final bank = openState.items[index];
-          return ValueListenableBuilder<int?>(
-            valueListenable: selectedTileIndex,
-            builder: (context, selectedIndex, child) {
-              final isSelected = selectedIndex == index;
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                decoration: BoxDecoration(
-                  color: isSelected ? primaryColor.withOpacity(0.05) : null,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  leading: Container(
-                    padding: const EdgeInsets.all(8),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.1),
+              width: 1,
+            ),
+          ),
+          child: ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: openState.items.length,
+            separatorBuilder: (context, index) => Divider(
+              height: 0,
+              color: Colors.white.withOpacity(0.1),
+              indent: 16,
+              endIndent: 16,
+            ),
+            itemBuilder: (context, index) {
+              final bank = openState.items[index];
+              return ValueListenableBuilder<int?>(
+                valueListenable: selectedTileIndex,
+                builder: (context, selectedIndex, child) {
+                  final isSelected = selectedIndex == index;
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
                     decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.1),
-                      shape: BoxShape.circle,
+                      color: isSelected
+                          ? Colors.white.withOpacity(0.1)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(
-                      Icons.account_balance,
-                      color: primaryColor,
-                      size: 24,
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                      leading: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFD4AF37).withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.account_balance,
+                          color: const Color(0xFFD4AF37),
+                          size: 24,
+                        ),
+                      ),
+                      title: Text(
+                        bank.title!,
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                      subtitle: Text(
+                        bank.subtitle.toString(),
+                        style: GoogleFonts.poppins(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
+                        ),
+                      ),
+                      trailing: Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: isSelected
+                                ? const Color(0xFFD4AF37)
+                                : Colors.white.withOpacity(0.3),
+                            width: 2,
+                          ),
+                          color: isSelected
+                              ? const Color(0xFFD4AF37)
+                              : Colors.transparent,
+                        ),
+                        child: isSelected
+                            ? const Icon(Icons.check,
+                                size: 16, color: Colors.black)
+                            : null,
+                      ),
+                      onTap: () =>
+                          selectedTileIndex.value = isSelected ? null : index,
+                      splashColor:
+                          Colors.white24, // Add Material touch feedback
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                  ),
-                  title: Text(
-                    bank.title!,
-                    style: GoogleFonts.roboto(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey[800],
-                      fontSize: 16,
-                    ),
-                  ),
-                  subtitle: Text(
-                    bank.subtitle.toString(),
-                    style: GoogleFonts.roboto(
-                      color: Colors.grey[600],
-                      fontSize: 14,
-                    ),
-                  ),
-                  trailing: Checkbox(
-                    value: isSelected,
-                    onChanged: (value) =>
-                        selectedTileIndex.value = value! ? index : null,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    activeColor: primaryColor,
-                  ),
-                  onTap: () =>
-                      selectedTileIndex.value = isSelected ? null : index,
-                ),
+                  );
+                },
               );
             },
-          );
-        },
+          ),
+        ),
       ),
     );
   }
@@ -210,19 +265,22 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
   Widget _buildFooter(OpenStateBody openState) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.1),
+          width: 1,
+        ),
       ),
       child: Text(
         openState.footer,
         textAlign: TextAlign.center,
-        style: GoogleFonts.roboto(
-          color: Colors.grey[600],
+        style: GoogleFonts.poppins(
+          color: Colors.white.withOpacity(0.7),
           fontSize: 14,
-          fontWeight: FontWeight.w500,
+          height: 1.5,
         ),
       ),
     );
@@ -233,12 +291,15 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          CircularProgressIndicator(color: primaryColor),
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation(Colors.white.withOpacity(0.8)),
+            strokeWidth: 2,
+          ),
           const SizedBox(height: 16),
           Text(
-            'Loading options...',
-            style: GoogleFonts.roboto(
-              color: Colors.grey[600],
+            'Loading payment options...',
+            style: GoogleFonts.poppins(
+              color: Colors.white.withOpacity(0.8),
               fontSize: 14,
             ),
           ),
@@ -252,12 +313,13 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.error_outline, color: Colors.red[300], size: 48),
+          Icon(Icons.error_outline,
+              color: Colors.white.withOpacity(0.8), size: 48),
           const SizedBox(height: 16),
           Text(
             'Failed to load data',
-            style: GoogleFonts.roboto(
-              color: Colors.grey[800],
+            style: GoogleFonts.poppins(
+              color: Colors.white.withOpacity(0.9),
               fontSize: 16,
               fontWeight: FontWeight.w600,
             ),
@@ -265,8 +327,8 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
           const SizedBox(height: 8),
           Text(
             error,
-            style: GoogleFonts.roboto(
-              color: Colors.grey[600],
+            style: GoogleFonts.poppins(
+              color: Colors.white.withOpacity(0.7),
               fontSize: 14,
             ),
             textAlign: TextAlign.center,
@@ -281,12 +343,13 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.hourglass_empty, color: Colors.grey[400], size: 48),
+          Icon(Icons.hourglass_empty,
+              color: Colors.white.withOpacity(0.8), size: 48),
           const SizedBox(height: 16),
           Text(
             'No payment options available',
-            style: GoogleFonts.roboto(
-              color: Colors.grey[800],
+            style: GoogleFonts.poppins(
+              color: Colors.white.withOpacity(0.9),
               fontSize: 16,
               fontWeight: FontWeight.w600,
             ),
@@ -295,6 +358,4 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
       ),
     );
   }
-
-  void reverseStackPopupAnim() {}
 }

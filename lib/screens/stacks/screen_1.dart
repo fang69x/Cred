@@ -185,15 +185,6 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
           ],
         ),
       ),
-      // child: Container(
-      //   decoration: BoxDecoration(
-      //     image: DecorationImage(
-      //       image: AssetImage('assets/images/subtle_texture.png'),
-      //       fit: BoxFit.cover,
-      //       opacity: 0.1,
-      //     ),
-      //   ),
-      // ),
     );
   }
 
@@ -386,7 +377,10 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
         const SizedBox(height: 8),
         ShaderMask(
           shaderCallback: (bounds) => LinearGradient(
-            colors: [Colors.blueAccent, Colors.purpleAccent],
+            colors: [
+              const Color(0xFF947D4E),
+              Color.fromARGB(212, 253, 182, 49)
+            ],
           ).createShader(bounds),
           child: Text(
             NumberFormat.currency(

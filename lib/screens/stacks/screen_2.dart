@@ -321,57 +321,72 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
   }
 
   Widget _selectedAmountWidget(ClosedStateBody closedState) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          closedState.key1!,
-          style: GoogleFonts.roboto(
-            color: Colors.white.withOpacity(0.5),
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-        const SizedBox(height: 8),
-        ShaderMask(
-          shaderCallback: (bounds) => LinearGradient(
-            colors: [Colors.blueAccent, Colors.purpleAccent],
-          ).createShader(bounds),
-          child: Text(
-            selectedEMIPlan.amount,
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            closedState.key1!,
             style: GoogleFonts.roboto(
-              fontSize: 36,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
+              color: Colors.white.withOpacity(0.8),
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
             ),
           ),
-        ),
-      ],
+          ShaderMask(
+            shaderCallback: (bounds) => LinearGradient(
+              colors: [
+                const Color(0xFF947D4E),
+                Color.fromARGB(212, 253, 182, 49)
+              ],
+            ).createShader(bounds),
+            child: Text(
+              selectedEMIPlan.amount,
+              style: GoogleFonts.roboto(
+                fontSize: 28,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _durationWidget(ClosedStateBody closedState) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          closedState.key2!,
-          style: GoogleFonts.roboto(
-            color: Colors.white.withOpacity(0.5),
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            closedState.key2!,
+            style: GoogleFonts.roboto(
+              color: const Color.fromARGB(255, 255, 255, 255).withOpacity(0.8),
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          selectedEMIPlan.duration,
-          style: GoogleFonts.roboto(
-            color: Colors.white.withOpacity(0.7),
-            fontSize: 24,
-            fontWeight: FontWeight.w500,
+          ShaderMask(
+            shaderCallback: (bounds) => LinearGradient(
+              colors: [
+                Color.fromARGB(212, 253, 182, 49),
+                const Color(0xFF947D4E)
+              ],
+            ).createShader(bounds),
+            child: Text(
+              selectedEMIPlan.duration,
+              style: GoogleFonts.roboto(
+                fontSize: 26,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

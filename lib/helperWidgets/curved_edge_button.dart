@@ -43,7 +43,6 @@ class _CurvedEdgeButtonState extends State<CurvedEdgeButton>
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   bool _isHovered = false;
-  bool _isPressed = false;
 
   @override
   void initState() {
@@ -83,96 +82,88 @@ class _CurvedEdgeButtonState extends State<CurvedEdgeButton>
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
       colors: [
-        const Color(0xFF1A1A2E).withOpacity(0.95),
         const Color(0xFF0A2F4D).withOpacity(0.90),
+        const Color(0xFF1A1A2E).withOpacity(0.95)
       ],
     );
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: GestureDetector(
-        onTapDown: (_) {
-          setState(() => _isPressed = true);
-          _controller.forward();
-        },
-        onTapUp: (_) {
-          setState(() => _isPressed = false);
-          _controller.reverse();
-        },
-        onTapCancel: () {
-          setState(() => _isPressed = false);
-          _controller.reverse();
-        },
-        onTap: () {
-          widget.onTap();
-          HapticFeedback.lightImpact();
-        },
-        child: AnimatedBuilder(
-          animation: _scaleAnimation,
-          builder: (context, child) => Transform.scale(
-            scale: _scaleAnimation.value,
-            child: Container(
-              height: calculatedHeight,
-              width: calculatedWidth,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(calculatedCurveRadius),
-                gradient: widget.gradient ?? defaultGradient,
-                border: Border.all(
-                  color: Colors.white.withOpacity(_isHovered ? 0.2 : 0.1),
-                  width: 1,
-                ),
-                boxShadow: widget.showShadow
-                    ? [
-                        BoxShadow(
-                          color: const Color.fromARGB(255, 0, 0, 0)
-                              .withOpacity(0.15),
-                          blurRadius: _isHovered ? 20 : 15,
-                          spreadRadius: _isHovered ? 1 : 0,
-                          offset: const Offset(0, 5),
-                        ),
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ]
-                    : null,
+    return GestureDetector(
+      onTapDown: (_) {
+        _controller.forward();
+      },
+      onTapUp: (_) {
+        _controller.reverse();
+      },
+      onTapCancel: () {
+        _controller.reverse();
+      },
+      onTap: () {
+        widget.onTap();
+        HapticFeedback.lightImpact();
+      },
+      child: AnimatedBuilder(
+        animation: _scaleAnimation,
+        builder: (context, child) => Transform.scale(
+          scale: _scaleAnimation.value,
+          child: Container(
+            height: calculatedHeight,
+            width: calculatedWidth,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(calculatedCurveRadius),
+              gradient: widget.gradient ?? defaultGradient,
+              border: Border.all(
+                color: Colors.white.withOpacity(_isHovered ? 0.2 : 0.1),
+                width: 1,
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(calculatedCurveRadius),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius:
-                          BorderRadius.circular(calculatedCurveRadius),
-                      color: Colors.white.withOpacity(0.05),
-                    ),
-                    child: Center(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: screenWidth * 0.06,
-                        ),
-                        child: Text(
-                          widget.text,
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: widget.textColor,
-                            fontWeight: widget.fontWeight,
-                            fontSize: calculatedFontSize,
-                            fontFamily: widget.fontFamily,
-                            letterSpacing: 1.0,
-                            shadows: [
-                              Shadow(
-                                color: const Color.fromARGB(255, 0, 0, 0)
-                                    .withOpacity(0.5),
-                                blurRadius: 20,
-                              ),
-                            ],
-                          ),
+              boxShadow: widget.showShadow
+                  ? [
+                      BoxShadow(
+                        color: const Color.fromARGB(255, 0, 0, 0)
+                            .withOpacity(0.15),
+                        blurRadius: _isHovered ? 20 : 15,
+                        spreadRadius: _isHovered ? 1 : 0,
+                        offset: const Offset(0, 5),
+                      ),
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ]
+                  : null,
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(calculatedCurveRadius),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(calculatedCurveRadius),
+                    color: Colors.white.withOpacity(0.05),
+                  ),
+                  child: Center(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: screenWidth * 0.06,
+                      ),
+                      child: Text(
+                        widget.text,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: widget.textColor,
+                          fontWeight: widget.fontWeight,
+                          fontSize: calculatedFontSize,
+                          fontFamily: widget.fontFamily,
+                          letterSpacing: 1.0,
+                          shadows: [
+                            Shadow(
+                              color: const Color.fromARGB(255, 0, 0, 0)
+                                  .withOpacity(0.5),
+                              blurRadius: 20,
+                            ),
+                          ],
                         ),
                       ),
                     ),

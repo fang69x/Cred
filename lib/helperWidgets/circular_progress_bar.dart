@@ -81,20 +81,20 @@ class _CreditCardWidgetState extends State<CreditCardWidget>
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  const Color(0xFF1A1A2E).withOpacity(0.95),
-                  const Color(0xFF0A2F4D).withOpacity(0.90),
+                  const Color(0xFF141428).withOpacity(0.95),
+                  const Color(0xFF0A243D).withOpacity(0.90),
                 ],
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.2),
                   blurRadius: 20,
-                  offset: const Offset(0, 10),
+                  offset: const Offset(0, 50),
                 ),
                 BoxShadow(
                   color: Colors.blue.withOpacity(0.1),
                   blurRadius: 30,
-                  offset: const Offset(-10, -10),
+                  offset: const Offset(-10, -30),
                 ),
               ],
             ),
@@ -136,12 +136,10 @@ class _CreditCardWidgetState extends State<CreditCardWidget>
                                     cornerStyle: CornerStyle.bothFlat,
                                     width: 15,
                                     sizeUnit: GaugeSizeUnit.logicalPixel,
-                                    gradient: const SweepGradient(
-                                      colors: [
-                                        Color(0xFFFFD700),
-                                        Color.fromARGB(255, 235, 131, 3),
-                                      ],
-                                    ),
+                                    gradient: const SweepGradient(colors: [
+                                      const Color(0xFFD4AF37),
+                                      const Color(0xFF926F34)
+                                    ]),
                                   ),
                                   NeedlePointer(
                                     value: currentValue,
@@ -149,13 +147,12 @@ class _CreditCardWidgetState extends State<CreditCardWidget>
                                     needleLength: 0.6,
                                     knobStyle: KnobStyle(
                                       color: Colors.white,
-                                      borderColor: const Color.fromARGB(
-                                          255, 255, 153, 0),
+                                      borderColor: const Color(0xFF947D4E),
                                       borderWidth: 2,
                                       knobRadius: 0.08,
                                     ),
                                     tailStyle: const TailStyle(
-                                      color: Color(0xFFFFD700),
+                                      color: const Color(0xFFD4AF37),
                                       width: 4,
                                       length: 0.2,
                                     ),
@@ -164,8 +161,10 @@ class _CreditCardWidgetState extends State<CreditCardWidget>
                                 annotations: <GaugeAnnotation>[
                                   GaugeAnnotation(
                                     angle: 90,
-                                    positionFactor: 0.1,
+                                    positionFactor: 0.05,
                                     widget: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Text(
@@ -173,8 +172,9 @@ class _CreditCardWidgetState extends State<CreditCardWidget>
                                           style: TextStyle(
                                             fontSize: screenWidth * 0.045,
                                             fontWeight: FontWeight.w600,
-                                            color:
-                                                Colors.white.withOpacity(0.9),
+                                            color: const Color.fromARGB(
+                                                    132, 9, 32, 54)
+                                                .withOpacity(0.9),
                                           ),
                                         ),
                                         SizedBox(height: screenHeight * 0.01),
@@ -188,16 +188,17 @@ class _CreditCardWidgetState extends State<CreditCardWidget>
                                             fontSize: screenWidth * 0.06,
                                             fontWeight: FontWeight.bold,
                                             color: const Color.fromARGB(
-                                                172, 2, 36, 149),
+                                                    132, 9, 32, 54)
+                                                .withOpacity(0.9),
                                           ),
                                         ),
                                         SizedBox(height: screenHeight * 0.015),
                                         Text(
                                           widget.description,
                                           style: TextStyle(
-                                            fontSize: screenWidth * 0.035,
+                                            fontSize: screenWidth * 0.03,
                                             color: const Color.fromARGB(
-                                                    255, 0, 25, 250)
+                                                    193, 12, 0, 92)
                                                 .withOpacity(0.8),
                                           ),
                                           textAlign: TextAlign.center,
@@ -222,11 +223,12 @@ class _CreditCardWidgetState extends State<CreditCardWidget>
                         SliderTheme(
                           data: SliderThemeData(
                             trackHeight: 4,
-                            activeTrackColor: const Color(0xFFFFD700),
+                            activeTrackColor:
+                                const Color.fromARGB(255, 108, 89, 29),
                             inactiveTrackColor: Colors.white.withOpacity(0.1),
                             thumbColor: Colors.white,
-                            overlayColor:
-                                const Color(0xFFFFD700).withOpacity(0.2),
+                            overlayColor: const Color.fromARGB(255, 0, 0, 0)
+                                .withOpacity(0.2),
                             thumbShape: const RoundSliderThumbShape(
                               enabledThumbRadius: 8,
                             ),

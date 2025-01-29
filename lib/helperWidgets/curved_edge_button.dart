@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:ui';
 
-class CurvedEdgeButton extends StatelessWidget {
+class CurvedEdgeButton extends StatefulWidget {
   final String text;
   final VoidCallback onTap;
   final double? height;
@@ -23,7 +24,7 @@ class CurvedEdgeButton extends StatelessWidget {
     this.height,
     this.width,
     this.curveRadius,
-    this.backgroundColor = const Color(0xFF4A4A4A),
+    this.backgroundColor = const Color(0xFF1A1A2E),
     this.textColor = Colors.white,
     this.fontWeight = FontWeight.w600,
     this.fontSize,
@@ -34,71 +35,147 @@ class CurvedEdgeButton extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<CurvedEdgeButton> createState() => _CurvedEdgeButtonState();
+}
+
+class _CurvedEdgeButtonState extends State<CurvedEdgeButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  bool _isHovered = false;
+  bool _isPressed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.95,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOut,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    final theme = Theme.of(context);
 
-    final calculatedHeight = height ?? screenHeight * 0.08;
-    final calculatedWidth = width ?? screenWidth * 0.9;
-    final calculatedCurveRadius = curveRadius ?? screenHeight * 0.03;
-    final calculatedFontSize = fontSize ?? screenWidth * 0.045;
+    final calculatedHeight = widget.height ?? screenHeight * 0.08;
+    final calculatedWidth = widget.width ?? screenWidth * 0.9;
+    final calculatedCurveRadius = widget.curveRadius ?? screenHeight * 0.03;
+    final calculatedFontSize = widget.fontSize ?? screenWidth * 0.045;
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      height: calculatedHeight,
-      width: calculatedWidth,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(calculatedCurveRadius),
-        boxShadow: showShadow
-            ? [
-                BoxShadow(
-                  color: theme.shadowColor.withOpacity(0.3),
-                  blurRadius: 20,
-                  spreadRadius: 2,
-                  offset: const Offset(0, 5),
+    final defaultGradient = LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        const Color(0xFF1A1A2E).withOpacity(0.95),
+        const Color(0xFF0A2F4D).withOpacity(0.90),
+      ],
+    );
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: GestureDetector(
+        onTapDown: (_) {
+          setState(() => _isPressed = true);
+          _controller.forward();
+        },
+        onTapUp: (_) {
+          setState(() => _isPressed = false);
+          _controller.reverse();
+        },
+        onTapCancel: () {
+          setState(() => _isPressed = false);
+          _controller.reverse();
+        },
+        onTap: () {
+          widget.onTap();
+          HapticFeedback.lightImpact();
+        },
+        child: AnimatedBuilder(
+          animation: _scaleAnimation,
+          builder: (context, child) => Transform.scale(
+            scale: _scaleAnimation.value,
+            child: Container(
+              height: calculatedHeight,
+              width: calculatedWidth,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(calculatedCurveRadius),
+                gradient: widget.gradient ?? defaultGradient,
+                border: Border.all(
+                  color: Colors.white.withOpacity(_isHovered ? 0.2 : 0.1),
+                  width: 1,
                 ),
-              ]
-            : null,
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(calculatedCurveRadius),
-          onTap: () {
-            onTap();
-            HapticFeedback.lightImpact();
-          },
-          splashColor: textColor.withOpacity(0.1),
-          highlightColor: textColor.withOpacity(0.05),
-          child: Ink(
-            decoration: BoxDecoration(
-              gradient: gradient ??
-                  LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [backgroundColor, backgroundColor.darken(0.1)],
-                  ),
-              borderRadius: BorderRadius.circular(calculatedCurveRadius),
-            ),
-            child: Center(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
-                child: AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 200),
-                  style: TextStyle(
-                    color: textColor,
-                    fontWeight: fontWeight,
-                    fontSize: calculatedFontSize,
-                    fontFamily: fontFamily,
-                    letterSpacing: 0.8,
-                  ),
-                  child: Text(
-                    text,
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                boxShadow: widget.showShadow
+                    ? [
+                        BoxShadow(
+                          color: const Color.fromARGB(255, 0, 0, 0)
+                              .withOpacity(0.15),
+                          blurRadius: _isHovered ? 20 : 15,
+                          spreadRadius: _isHovered ? 1 : 0,
+                          offset: const Offset(0, 5),
+                        ),
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
+                        ),
+                      ]
+                    : null,
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(calculatedCurveRadius),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius:
+                          BorderRadius.circular(calculatedCurveRadius),
+                      color: Colors.white.withOpacity(0.05),
+                    ),
+                    child: Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: screenWidth * 0.06,
+                        ),
+                        child: Text(
+                          widget.text,
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: widget.textColor,
+                            fontWeight: widget.fontWeight,
+                            fontSize: calculatedFontSize,
+                            fontFamily: widget.fontFamily,
+                            letterSpacing: 1.0,
+                            shadows: [
+                              Shadow(
+                                color: const Color.fromARGB(255, 0, 0, 0)
+                                    .withOpacity(0.5),
+                                blurRadius: 20,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -107,16 +184,5 @@ class CurvedEdgeButton extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-extension ColorDarken on Color {
-  Color darken([double amount = .1]) {
-    assert(amount >= 0 && amount <= 1);
-
-    final hsl = HSLColor.fromColor(this);
-    final hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
-
-    return hslDark.toColor();
   }
 }

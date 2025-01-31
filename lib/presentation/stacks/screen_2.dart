@@ -128,7 +128,7 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
         children: [
           Icon(Icons.error_outline,
               color: Colors.white.withOpacity(0.8), size: 40),
-          const SizedBox(height: 16),
+          SizedBox(height: MediaQueryUtil.getDefaultHeightDim(16)),
           Text(
             'Failed to load data',
             style: GoogleFonts.roboto(
@@ -137,7 +137,7 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
               fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: MediaQueryUtil.getDefaultHeightDim(8)),
           Text(
             error,
             style: GoogleFonts.roboto(
@@ -158,7 +158,7 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
         children: [
           Icon(Icons.hourglass_empty,
               color: Colors.white.withOpacity(0.8), size: 40),
-          const SizedBox(height: 16),
+          SizedBox(height: MediaQueryUtil.getDefaultHeightDim(16)),
           Text(
             'No data available',
             style: GoogleFonts.roboto(
@@ -227,7 +227,7 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
                   },
                   handleEMIPlan: () {}),
             )
-          : const SizedBox();
+          : SizedBox(height: MediaQueryUtil.getDefaultHeightDim(2));
     });
   }
 
@@ -266,18 +266,16 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
                 'originalViewKey${StackPopupModel.getCurrentStackPopupIndex()}'),
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 40),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: _buildHeaderSection(openState),
               ),
-              const SizedBox(height: 40),
               EMIPlan(
                 onEMIChange: onEMIPlanChange,
                 emiPlanItems: openState.items,
                 footer: openState.footer,
               ),
-              const SizedBox(height: 40),
+              SizedBox(height: MediaQueryUtil.getDefaultHeightDim(40)),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: _buildActionButton(claT),
@@ -302,7 +300,7 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
             height: 1.2,
           ),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: MediaQueryUtil.getDefaultHeightDim(12)),
         Text(
           openState.subtitle,
           style: GoogleFonts.roboto(

@@ -25,6 +25,7 @@ class _EMIPlanState extends State<EMIPlan> {
 
   @override
   Widget build(BuildContext context) {
+    MediaQueryUtil.init(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -53,8 +54,10 @@ class _EMIPlanState extends State<EMIPlan> {
                   },
                   child: Container(
                     width: MediaQueryUtil.getDefaultWidthDim(720),
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 12.0, vertical: 8),
+                    margin: EdgeInsets.symmetric(
+                      horizontal: MediaQueryUtil.getDefaultWidthDim(50),
+                      vertical: MediaQueryUtil.getDefaultHeightDim(50),
+                    ),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
                       gradient: LinearGradient(
@@ -98,17 +101,16 @@ class _EMIPlanState extends State<EMIPlan> {
                                     FontWeight.w800,
                                     "Inter",
                                     FontStyle.normal,
-                                    90,
+                                    MediaQueryUtil.getFontSize(240),
                                     TextAlign.left,
                                   ),
-                                  const SizedBox(height: 8),
                                   CommonWidgets.FontWidget(
                                     plan.subtitle ?? 'N/A',
                                     Colors.white.withOpacity(0.9),
                                     FontWeight.w500,
                                     "Inter",
                                     FontStyle.normal,
-                                    65,
+                                    MediaQueryUtil.getFontSize(200),
                                     TextAlign.left,
                                   ),
                                 ],
@@ -119,18 +121,20 @@ class _EMIPlanState extends State<EMIPlan> {
                         ),
                         if (isSelected)
                           Positioned(
-                            right: 20,
-                            top: 20,
+                            right: MediaQueryUtil.getDefaultWidthDim(20),
+                            top: MediaQueryUtil.getDefaultHeightDim(20),
                             child: Container(
-                              padding: const EdgeInsets.all(6),
+                              padding: EdgeInsets.all(
+                                MediaQueryUtil.getValueInPixel(40),
+                              ),
                               decoration: const BoxDecoration(
                                 color: Colors.white,
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.check_rounded,
                                 color: Color(0xFFFDB631),
-                                size: 24,
+                                size: MediaQueryUtil.getFontSize(50),
                               ),
                             ),
                           ),
@@ -142,7 +146,7 @@ class _EMIPlanState extends State<EMIPlan> {
             },
           ),
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: MediaQueryUtil.getDefaultHeightDim(20)),
         _buildFooterButton(),
       ],
     );
@@ -150,7 +154,10 @@ class _EMIPlanState extends State<EMIPlan> {
 
   Widget _buildTag(String text) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: EdgeInsets.symmetric(
+        horizontal: MediaQueryUtil.getDefaultWidthDim(24),
+        vertical: MediaQueryUtil.getDefaultHeightDim(12),
+      ),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.9),
         borderRadius: BorderRadius.circular(20),
@@ -161,7 +168,7 @@ class _EMIPlanState extends State<EMIPlan> {
         FontWeight.w600,
         "Inter",
         FontStyle.normal,
-        38,
+        MediaQueryUtil.getFontSize(150),
         TextAlign.left,
       ),
     );
@@ -171,7 +178,7 @@ class _EMIPlanState extends State<EMIPlan> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 20),
+        SizedBox(height: MediaQueryUtil.getDefaultHeightDim(100)),
         Row(
           children: [
             _buildDetailItem("EMI", plan.emi ?? 'N/A'),
@@ -193,7 +200,7 @@ class _EMIPlanState extends State<EMIPlan> {
           FontWeight.w500,
           "Inter",
           FontStyle.normal,
-          35,
+          MediaQueryUtil.getFontSize(200),
           TextAlign.left,
         ),
         CommonWidgets.FontWidget(
@@ -202,7 +209,7 @@ class _EMIPlanState extends State<EMIPlan> {
           FontWeight.w700,
           "Inter",
           FontStyle.normal,
-          45,
+          MediaQueryUtil.getFontSize(150),
           TextAlign.left,
         ),
       ],
@@ -212,27 +219,41 @@ class _EMIPlanState extends State<EMIPlan> {
   Widget _buildFooterButton() {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
-      margin: const EdgeInsets.symmetric(horizontal: 20),
+      margin: EdgeInsets.symmetric(
+        horizontal: MediaQueryUtil.getDefaultWidthDim(20),
+      ),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(
+          MediaQueryUtil.getValueInPixel(30),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
+            blurRadius: MediaQueryUtil.getValueInPixel(8),
+            offset: Offset(
+              0,
+              MediaQueryUtil.getValueInPixel(4),
+            ),
+          )
         ],
       ),
       child: ElevatedButton(
         onPressed: () => debugPrint("Footer button clicked!"),
         style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          padding: EdgeInsets.symmetric(
+            horizontal: MediaQueryUtil.getDefaultWidthDim(32),
+            vertical: MediaQueryUtil.getDefaultHeightDim(16),
+          ),
           backgroundColor: Colors.transparent, // Transparent background
           shadowColor: Colors.transparent, // No shadow from the button itself
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-            side:
-                const BorderSide(color: Colors.white, width: 2), // White border
+            borderRadius: BorderRadius.circular(
+              MediaQueryUtil.getValueInPixel(100),
+            ),
+            side: BorderSide(
+              color: Colors.white,
+              width: MediaQueryUtil.getValueInPixel(5),
+            ), // White border
           ),
         ),
         child: Row(
@@ -247,9 +268,12 @@ class _EMIPlanState extends State<EMIPlan> {
               45,
               TextAlign.center,
             ),
-            const SizedBox(width: 12),
-            const Icon(Icons.arrow_forward_rounded,
-                color: Colors.white, size: 24),
+            SizedBox(width: MediaQueryUtil.getDefaultWidthDim(12)),
+            Icon(
+              Icons.arrow_forward_rounded,
+              color: Colors.white,
+              size: MediaQueryUtil.getFontSize(40),
+            ),
           ],
         ),
       ),

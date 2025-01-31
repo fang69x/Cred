@@ -1,3 +1,4 @@
+import 'package:cred/core/constants/media_query.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -110,11 +111,11 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeader(openState),
-            const SizedBox(height: 10),
+            SizedBox(height: MediaQueryUtil.getDefaultHeightDim(10)),
             _buildBankList(openState),
-            const SizedBox(height: 20),
+            SizedBox(height: MediaQueryUtil.getDefaultHeightDim(20)),
             _buildFooter(openState),
-            const SizedBox(height: 40),
+            SizedBox(height: MediaQueryUtil.getDefaultHeightDim(40)),
             CurvedEdgeButton(
               text: ctaText,
               width: double.infinity,
@@ -140,7 +141,7 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
             letterSpacing: -0.5,
           ),
         ),
-        const SizedBox(height: 5),
+        SizedBox(height: MediaQueryUtil.getDefaultHeightDim(5)),
         Text(
           openState.subtitle,
           style: GoogleFonts.poppins(
@@ -295,7 +296,7 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
             valueColor: AlwaysStoppedAnimation(Colors.white.withOpacity(0.8)),
             strokeWidth: 2,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: MediaQueryUtil.getDefaultHeightDim(16)),
           Text(
             'Loading payment options...',
             style: GoogleFonts.poppins(
@@ -315,7 +316,7 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
         children: [
           Icon(Icons.error_outline,
               color: Colors.white.withOpacity(0.8), size: 48),
-          const SizedBox(height: 16),
+          SizedBox(height: MediaQueryUtil.getDefaultHeightDim(16)),
           Text(
             'Failed to load data',
             style: GoogleFonts.poppins(
@@ -324,7 +325,7 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: MediaQueryUtil.getDefaultHeightDim(8)),
           Text(
             error,
             style: GoogleFonts.poppins(

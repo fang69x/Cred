@@ -55,6 +55,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    MediaQueryUtil.init(context);
     return Consumer<CredDataProvider>(
       builder: (context, credDataProvider, child) {
         if (credDataProvider.isLoading) {
@@ -127,7 +128,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
         children: [
           Icon(Icons.error_outline,
               color: Colors.white.withOpacity(0.8), size: 40),
-          const SizedBox(height: 16),
+          SizedBox(height: MediaQueryUtil.getDefaultHeightDim(40)),
           Text(
             'Failed to load data',
             style: GoogleFonts.roboto(
@@ -136,7 +137,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
               fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: MediaQueryUtil.getDefaultHeightDim(40)),
           Text(
             error,
             style: GoogleFonts.roboto(
@@ -157,7 +158,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
         children: [
           Icon(Icons.hourglass_empty,
               color: Colors.white.withOpacity(0.8), size: 40),
-          const SizedBox(height: 16),
+          SizedBox(height: MediaQueryUtil.getDefaultHeightDim(40)),
           Text(
             'No data available',
             style: GoogleFonts.roboto(
@@ -221,7 +222,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
               screenNumber: 1,
               child: const Screen2(),
             )
-          : const SizedBox();
+          : SizedBox(height: MediaQueryUtil.getDefaultHeightDim(40));
     });
   }
 
@@ -260,9 +261,10 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
   Widget _hudElement() {
     return Padding(
       padding: EdgeInsets.only(
-        top: MediaQueryUtil.getPaddingTop() + 24,
-        left: 24,
-        right: 24,
+        top: MediaQueryUtil.getPaddingTop() +
+            MediaQueryUtil.getDefaultHeightDim(24),
+        left: MediaQueryUtil.getDefaultWidthDim(24),
+        right: MediaQueryUtil.getDefaultWidthDim(24),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -282,23 +284,18 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
   }
 
   Widget _originalView(OpenStateBody openState, String claT) {
-    return GestureDetector(
-      onTap: _reverseStackPopupAnim,
-      child: SafeArea(
-        child: Column(
-          key: ValueKey(
-              'originalViewKey${StackPopupModel.getCurrentStackPopupIndex()}'),
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: _buildHeaderSection(openState),
-            ),
-            const SizedBox(height: 40),
-            _buildCreditCardWidget(openState),
-            const SizedBox(height: 40),
-            _buildActionButton(claT),
-          ],
-        ),
+    return SafeArea(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: _buildHeaderSection(openState),
+          ),
+          SizedBox(height: MediaQueryUtil.getDefaultHeightDim(40)),
+          Expanded(child: _buildCreditCardWidget(openState)),
+          SizedBox(height: MediaQueryUtil.getDefaultHeightDim(40)),
+          _buildActionButton(claT),
+        ],
       ),
     );
   }
@@ -314,14 +311,14 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
             key: ValueKey(openState.title),
             style: GoogleFonts.poppins(
               color: Colors.white,
-              fontSize: 32,
+              fontSize: MediaQueryUtil.getFontSize(80),
               fontWeight: FontWeight.w700,
               height: 1.2,
               letterSpacing: -0.5,
             ),
           ),
         ),
-        SizedBox(height: 16),
+        SizedBox(height: MediaQueryUtil.getDefaultHeightDim(100)),
         AnimatedOpacity(
           duration: Duration(milliseconds: 500),
           opacity: 1,
@@ -329,7 +326,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
             openState.subtitle,
             style: GoogleFonts.poppins(
               color: Colors.white.withOpacity(0.85),
-              fontSize: 16,
+              fontSize: MediaQueryUtil.getFontSize(50),
               fontWeight: FontWeight.w400,
               height: 1.4,
             ),
@@ -354,6 +351,8 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
 
   Widget _buildActionButton(String claT) {
     return CurvedEdgeButton(
+      width: MediaQueryUtil.getDefaultWidthDim(double.infinity),
+      height: MediaQueryUtil.getDefaultHeightDim(200),
       text: claT,
       onTap: () {
         if (provider.getIsEmiClicked()) return;
@@ -374,7 +373,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
             fontWeight: FontWeight.w500,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: MediaQueryUtil.getDefaultHeightDim(40)),
         ShaderMask(
           shaderCallback: (bounds) => LinearGradient(
             colors: [

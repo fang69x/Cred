@@ -259,25 +259,31 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
     return GestureDetector(
       onTap: _reverseStackPopupAnim,
       child: SafeArea(
-        child: Column(
-          key: ValueKey(
-              'originalViewKey${StackPopupModel.getCurrentStackPopupIndex()}'),
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 40),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: _buildHeaderSection(openState),
-            ),
-            const SizedBox(height: 40),
-            EMIPlan(
-              onEMIChange: onEMIPlanChange,
-              emiPlanItems: openState.items,
-              footer: openState.footer,
-            ),
-            const SizedBox(height: 40),
-            _buildActionButton(claT),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            key: ValueKey(
+                'originalViewKey${StackPopupModel.getCurrentStackPopupIndex()}'),
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 40),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: _buildHeaderSection(openState),
+              ),
+              const SizedBox(height: 40),
+              EMIPlan(
+                onEMIChange: onEMIPlanChange,
+                emiPlanItems: openState.items,
+                footer: openState.footer,
+              ),
+              const SizedBox(height: 40),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: _buildActionButton(claT),
+              ),
+            ],
+          ),
         ),
       ),
     );

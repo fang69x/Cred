@@ -1,17 +1,17 @@
 import 'dart:ui';
-import 'package:cred/helperWidgets/curved_edge_button.dart';
-import 'package:cred/helperWidgets/emi_plan.dart';
-import 'package:cred/helperWidgets/glass_panel.dart';
-import 'package:cred/models/api.model.dart';
-import 'package:cred/providers/data.provider.dart';
-import 'package:cred/providers/screen_provider.dart';
-import 'package:cred/service/api.service.dart';
+import 'package:cred/presentation/widgets/curved_edge_button.dart';
+import 'package:cred/presentation/widgets/emi_plan_widget.dart';
+import 'package:cred/presentation/widgets/collapsed_glass_panel.dart';
+import 'package:cred/data/models/api.model.dart';
+import 'package:cred/presentation/providers/api_data_provider.dart';
+import 'package:cred/presentation/providers/screen_provider.dart';
+import 'package:cred/data/service/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../../models/emi_plan_model.dart';
-import '../../models/stack_popup.dart';
-import '../../utils/media_query.dart';
+import '../../data/models/emi_plan_model.dart';
+import '../../data/models/stack_popup.dart';
+import '../../core/constants/media_query.dart';
 import 'screen_3.dart';
 import 'stack_popup.dart';
 

@@ -1,7 +1,7 @@
-import 'package:cred/providers/data.provider.dart';
-import 'package:cred/providers/stack_manager.dart';
-import 'package:cred/screens/home.screen.dart';
-import 'package:cred/screens/intro_screen.dart';
+import 'package:cred/presentation/providers/api_data_provider.dart';
+import 'package:cred/presentation/providers/stack_manager.dart';
+import 'package:cred/presentation/pages/home_screen.dart';
+import 'package:cred/presentation/pages/intro_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';

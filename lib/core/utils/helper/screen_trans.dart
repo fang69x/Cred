@@ -1,5 +1,5 @@
-import 'package:cred/screens/home.screen.dart';
-import 'package:cred/screens/intro_screen.dart';
+import 'package:cred/presentation/pages/home_screen.dart';
+import 'package:cred/presentation/pages/intro_screen.dart';
 
 import 'package:flutter/material.dart';
 

@@ -1,4 +1,4 @@
-import 'package:cred/screens/stacks/screen_1.dart';
+import 'package:cred/presentation/stacks/screen_1.dart';
 
 import 'package:flutter/material.dart';
 

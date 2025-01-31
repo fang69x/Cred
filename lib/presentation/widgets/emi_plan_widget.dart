@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../models/emi_plan_model.dart';
-import '../utils/common_widgets.dart';
-import '../utils/media_query.dart';
-import '../models/api.model.dart';
+import '../../data/models/emi_plan_model.dart';
+import 'common_widgets.dart';
+import '../../core/constants/media_query.dart';
+import '../../data/models/api.model.dart';
 
 class EMIPlan extends StatefulWidget {
   final Function onEMIChange;

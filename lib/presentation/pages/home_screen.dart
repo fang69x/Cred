@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:neopop/neopop.dart';
-import 'package:cred/utils/media_query.dart';
-import 'package:cred/utils/screen_trans.dart';
+import 'package:cred/core/constants/media_query.dart';
+import 'package:cred/core/utils/helper/screen_trans.dart';
 
 class HomeScreen extends StatefulWidget {
   static const routeName = "/home";

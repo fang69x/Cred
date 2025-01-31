@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'media_query.dart';
+import '../../core/constants/media_query.dart';
 
 class CommonWidgets {
   static Widget FontWidget(String txt,
@@ -28,7 +28,7 @@ class CommonWidgets {
     );
   }
 
-   static Widget getBackButtonWidget() {
+  static Widget getBackButtonWidget() {
     return const Icon(
       Icons.arrow_back_ios_sharp,
       color: Colors.white,

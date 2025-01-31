@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'dart:ui';
-import 'package:cred/helperWidgets/curved_edge_button.dart';
-import 'package:cred/models/api.model.dart';
-import 'package:cred/models/stack_popup.dart';
-import 'package:cred/providers/data.provider.dart';
+import 'package:cred/presentation/widgets/curved_edge_button.dart';
+import 'package:cred/data/models/api.model.dart';
+import 'package:cred/data/models/stack_popup.dart';
+import 'package:cred/presentation/providers/api_data_provider.dart';
 
 class Screen3 extends StatefulWidget {
   final Function handleBackButton;

@@ -1,5 +1,5 @@
 import 'dart:ui';
-import 'package:cred/utils/media_query.dart';
+import 'package:cred/core/constants/media_query.dart';
 import 'package:flutter/material.dart';
 
 class StackPopup extends StatefulWidget {

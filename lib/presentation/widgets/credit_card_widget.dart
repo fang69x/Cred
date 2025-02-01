@@ -18,6 +18,7 @@ class CreditCardWidget extends StatefulWidget {
     required this.description,
     required this.footer,
     required this.onChanged,
+    required double cardHeight,
   }) : super(key: key);
 
   @override

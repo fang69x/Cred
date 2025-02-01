@@ -47,6 +47,7 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    MediaQueryUtil.init(context);
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -106,7 +107,8 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
   Widget _buildMainContent(OpenStateBody openState, String ctaText) {
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+        padding:
+            MediaQueryUtil.getResponsivePadding(horizontal: 40, vertical: 40),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -115,7 +117,7 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
             _buildBankList(openState),
             SizedBox(height: MediaQueryUtil.getDefaultHeightDim(20)),
             _buildFooter(openState),
-            SizedBox(height: MediaQueryUtil.getDefaultHeightDim(40)),
+            SizedBox(height: MediaQueryUtil.getDefaultHeightDim(100)),
             CurvedEdgeButton(
               text: ctaText,
               width: double.infinity,
@@ -135,18 +137,18 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
           openState.title,
           style: GoogleFonts.poppins(
             color: Colors.white,
-            fontSize: 18,
+            fontSize: MediaQueryUtil.getFontSize(80),
             fontWeight: FontWeight.w700,
             height: 1.2,
             letterSpacing: -0.5,
           ),
         ),
-        SizedBox(height: MediaQueryUtil.getDefaultHeightDim(5)),
+        SizedBox(height: MediaQueryUtil.getDefaultHeightDim(20)),
         Text(
           openState.subtitle,
           style: GoogleFonts.poppins(
             color: Colors.white.withOpacity(0.8),
-            fontSize: 12,
+            fontSize: MediaQueryUtil.getFontSize(40),
             fontWeight: FontWeight.w400,
             height: 1.4,
           ),
@@ -194,12 +196,13 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 10,
+                      contentPadding: MediaQueryUtil.getResponsivePadding(
+                        horizontal: 50,
+                        vertical: 40,
                       ),
                       leading: Container(
-                        padding: const EdgeInsets.all(10),
+                        padding: EdgeInsets.all(
+                            MediaQueryUtil.getDefaultWidthDim(10)),
                         decoration: BoxDecoration(
                           color: const Color(0xFFD4AF37).withOpacity(0.1),
                           shape: BoxShape.circle,
@@ -207,7 +210,7 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
                         child: Icon(
                           Icons.account_balance,
                           color: const Color(0xFFD4AF37),
-                          size: 24,
+                          size: MediaQueryUtil.getValueInPixel(100),
                         ),
                       ),
                       title: Text(
@@ -215,19 +218,19 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
                         style: GoogleFonts.poppins(
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
-                          fontSize: 16,
+                          fontSize: MediaQueryUtil.getFontSize(60),
                         ),
                       ),
                       subtitle: Text(
                         bank.subtitle.toString(),
                         style: GoogleFonts.poppins(
                           color: Colors.white.withOpacity(0.7),
-                          fontSize: 14,
+                          fontSize: MediaQueryUtil.getFontSize(50),
                         ),
                       ),
                       trailing: Container(
-                        width: 24,
-                        height: 24,
+                        width: MediaQueryUtil.getValueInPixel(100),
+                        height: MediaQueryUtil.getValueInPixel(80),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
@@ -280,7 +283,7 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
         textAlign: TextAlign.center,
         style: GoogleFonts.poppins(
           color: Colors.white.withOpacity(0.7),
-          fontSize: 14,
+          fontSize: MediaQueryUtil.getFontSize(50),
           height: 1.5,
         ),
       ),
@@ -301,7 +304,7 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
             'Loading payment options...',
             style: GoogleFonts.poppins(
               color: Colors.white.withOpacity(0.8),
-              fontSize: 14,
+              fontSize: MediaQueryUtil.getFontSize(50),
             ),
           ),
         ],
@@ -321,7 +324,7 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
             'Failed to load data',
             style: GoogleFonts.poppins(
               color: Colors.white.withOpacity(0.9),
-              fontSize: 16,
+              fontSize: MediaQueryUtil.getFontSize(50),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -330,7 +333,7 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
             error,
             style: GoogleFonts.poppins(
               color: Colors.white.withOpacity(0.7),
-              fontSize: 14,
+              fontSize: MediaQueryUtil.getFontSize(50),
             ),
             textAlign: TextAlign.center,
           ),
@@ -351,7 +354,7 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
             'No payment options available',
             style: GoogleFonts.poppins(
               color: Colors.white.withOpacity(0.9),
-              fontSize: 16,
+              fontSize: MediaQueryUtil.getFontSize(50),
               fontWeight: FontWeight.w600,
             ),
           ),

@@ -96,19 +96,19 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
           child: Stack(
             children: [
               _buildAnimatedBackground(),
-              Column(
-                // This Column now has proper children
-                children: [
-                  _hudElement(),
-                  Expanded(
-                    // Add this to make the content take remaining space
-                    child: ChangeNotifierProvider.value(
-                      value: provider,
-                      child:
-                          _stackPopupContent(openState!, claT!, closedState!),
+              Positioned.fill(
+                child: Column(
+                  children: [
+                    _hudElement(),
+                    Expanded(
+                      child: ChangeNotifierProvider.value(
+                        value: provider,
+                        child:
+                            _stackPopupContent(openState!, claT!, closedState!),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               ChangeNotifierProvider.value(
                 value: provider,
@@ -133,7 +133,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
             'Failed to load data',
             style: GoogleFonts.roboto(
               color: Colors.white.withOpacity(0.9),
-              fontSize: 18,
+              fontSize: MediaQueryUtil.getFontSize(50),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -142,7 +142,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
             error,
             style: GoogleFonts.roboto(
               color: Colors.white.withOpacity(0.7),
-              fontSize: 14,
+              fontSize: MediaQueryUtil.getFontSize(50),
             ),
             textAlign: TextAlign.center,
           ),
@@ -163,7 +163,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
             'No data available',
             style: GoogleFonts.roboto(
               color: Colors.white.withOpacity(0.9),
-              fontSize: 18,
+              fontSize: MediaQueryUtil.getFontSize(50),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -191,23 +191,21 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
 
   Widget _stackPopupContent(
       OpenStateBody openState, String claT, ClosedStateBody closedState) {
-    return Expanded(
-      // Add this to take remaining space
-      child: Stack(
-        children: [
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 200),
-            switchInCurve: Curves.easeOut,
-            switchOutCurve: Curves.easeIn,
-            child:
-                Consumer<ScreenProvider>(builder: (context, provider, child) {
+    return Stack(
+      children: [
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          switchInCurve: Curves.easeOut,
+          switchOutCurve: Curves.easeIn,
+          child: Consumer<ScreenProvider>(
+            builder: (context, provider, child) {
               return provider.getIsEmiClicked()
                   ? _stackPopupView(openState, closedState)
                   : _originalView(openState, claT);
-            }),
+            },
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -230,17 +228,17 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
     return GestureDetector(
       onTap: _reverseStackPopupAnim,
       child: Column(
-        // Add Column here
         children: [
           Expanded(
-            // Now Expanded is properly inside Column
             child: FrostedGlassPanel(
               height: MediaQueryUtil.safeHeight * 0.9,
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 10),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: MediaQueryUtil.getDefaultWidthDim(100),
+                      vertical: MediaQueryUtil.getDefaultHeightDim(30),
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -260,11 +258,12 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
 
   Widget _hudElement() {
     return Padding(
-      padding: EdgeInsets.only(
+      padding: MediaQueryUtil.getResponsivePadding(
+        horizontal: 24,
+        vertical: 24,
+      ).copyWith(
         top: MediaQueryUtil.getPaddingTop() +
             MediaQueryUtil.getDefaultHeightDim(24),
-        left: MediaQueryUtil.getDefaultWidthDim(24),
-        right: MediaQueryUtil.getDefaultWidthDim(24),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -288,13 +287,14 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(MediaQueryUtil.getValueInPixel(50)),
             child: _buildHeaderSection(openState),
           ),
-          SizedBox(height: MediaQueryUtil.getDefaultHeightDim(40)),
+          SizedBox(height: MediaQueryUtil.getDefaultHeightDim(50)),
           Expanded(child: _buildCreditCardWidget(openState)),
-          SizedBox(height: MediaQueryUtil.getDefaultHeightDim(40)),
+          SizedBox(height: MediaQueryUtil.getDefaultHeightDim(100)),
           _buildActionButton(claT),
+          SizedBox(height: MediaQueryUtil.getDefaultHeightDim(100)),
         ],
       ),
     );
@@ -343,6 +343,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
       header: openState.card!.header,
       footer: openState.footer,
       description: openState.card!.description,
+      cardHeight: MediaQueryUtil.getDefaultHeightDim(600),
       onChanged: (double progress, int finalValue) {
         loanDataObj.setLoanAmount(finalValue);
       },
@@ -350,14 +351,17 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
   }
 
   Widget _buildActionButton(String claT) {
-    return CurvedEdgeButton(
-      width: MediaQueryUtil.getDefaultWidthDim(double.infinity),
-      height: MediaQueryUtil.getDefaultHeightDim(200),
-      text: claT,
-      onTap: () {
-        if (provider.getIsEmiClicked()) return;
-        provider.setIsEmiClicked(true);
-      },
+    return Padding(
+      padding: MediaQueryUtil.getResponsivePadding(horizontal: 30),
+      child: CurvedEdgeButton(
+        width: MediaQueryUtil.getDefaultWidthDim(double.infinity),
+        height: MediaQueryUtil.getDefaultHeightDim(200),
+        text: claT,
+        onTap: () {
+          if (provider.getIsEmiClicked()) return;
+          provider.setIsEmiClicked(true);
+        },
+      ),
     );
   }
 
@@ -369,11 +373,11 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
           closedState.key1!,
           style: GoogleFonts.roboto(
             color: Colors.white.withOpacity(0.8),
-            fontSize: 16,
+            fontSize: MediaQueryUtil.getFontSize(50),
             fontWeight: FontWeight.w500,
           ),
         ),
-        SizedBox(height: MediaQueryUtil.getDefaultHeightDim(40)),
+        SizedBox(height: MediaQueryUtil.getDefaultHeightDim(2)),
         ShaderMask(
           shaderCallback: (bounds) => LinearGradient(
             colors: [
@@ -386,7 +390,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
                     locale: 'en_IN', symbol: '₹ ', decimalDigits: 0)
                 .format(loanDataObj.getLoanAmount()),
             style: GoogleFonts.roboto(
-              fontSize: 36,
+              fontSize: MediaQueryUtil.getFontSize(100),
               fontWeight: FontWeight.w700,
               color: Colors.white,
             ),

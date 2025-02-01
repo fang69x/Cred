@@ -3,12 +3,11 @@ import 'package:cred/presentation/providers/stack_manager.dart';
 import 'package:cred/presentation/pages/home_screen.dart';
 import 'package:cred/presentation/pages/intro_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await SharedPreferences.getInstance();
+
   runApp(
     MultiProvider(
       providers: [

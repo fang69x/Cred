@@ -232,11 +232,12 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
           children: [
             Padding(
               padding: MediaQueryUtil.getResponsivePadding(
-                  horizontal: 100, vertical: 20),
+                  horizontal: 80, vertical: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildSelectedAmountWidget(closedState),
+                  SizedBox(width: MediaQueryUtil.getDefaultWidthDim(100)),
                   _buildDurationWidget(closedState),
                   _buildControlIcons(),
                 ],
@@ -340,7 +341,7 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
               fontWeight: FontWeight.w400,
             ),
           ),
-          _buildGradientText(selectedEMIPlan.amount, 100,
+          _buildGradientText(selectedEMIPlan.amount, 90,
               const [Color(0xFF947D4E), Color.fromARGB(212, 253, 182, 49)]),
         ],
       ),
@@ -361,7 +362,7 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
               fontWeight: FontWeight.w400,
             ),
           ),
-          _buildGradientText(selectedEMIPlan.duration, 100,
+          _buildGradientText(selectedEMIPlan.duration, 90,
               [Color.fromARGB(212, 253, 182, 49), const Color(0xFF947D4E)]),
         ],
       ),
@@ -391,7 +392,7 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
           icon: Icon(
             Icons.keyboard_arrow_down_rounded,
             color: Colors.white.withOpacity(0.8),
-            size: MediaQueryUtil.getValueInPixel(24),
+            size: MediaQueryUtil.getValueInPixel(100),
           ),
           onPressed: _reverseStackPopupAnim,
         ),

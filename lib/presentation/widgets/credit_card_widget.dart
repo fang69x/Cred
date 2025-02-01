@@ -143,7 +143,7 @@ class _CreditCardWidgetState extends State<CreditCardWidget>
                                 axisLineStyle: AxisLineStyle(
                                   cornerStyle: CornerStyle.bothFlat,
                                   color: Colors.white.withOpacity(0.08),
-                                  thickness: MediaQueryUtil.getValueInPixel(15),
+                                  thickness: MediaQueryUtil.getValueInPixel(40),
                                 ),
                                 pointers: <GaugePointer>[
                                   RangePointer(

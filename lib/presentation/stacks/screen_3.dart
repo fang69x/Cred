@@ -108,16 +108,16 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
     return SingleChildScrollView(
       child: Padding(
         padding:
-            MediaQueryUtil.getResponsivePadding(horizontal: 40, vertical: 40),
+            MediaQueryUtil.getResponsivePadding(horizontal: 50, vertical: 50),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeader(openState),
-            SizedBox(height: MediaQueryUtil.getDefaultHeightDim(10)),
+            SizedBox(height: MediaQueryUtil.getDefaultHeightDim(50)),
             _buildBankList(openState),
-            SizedBox(height: MediaQueryUtil.getDefaultHeightDim(20)),
+            SizedBox(height: MediaQueryUtil.getDefaultHeightDim(50)),
             _buildFooter(openState),
-            SizedBox(height: MediaQueryUtil.getDefaultHeightDim(100)),
+            SizedBox(height: MediaQueryUtil.getDefaultHeightDim(50)),
             CurvedEdgeButton(
               text: ctaText,
               width: double.infinity,
@@ -161,7 +161,7 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 5),
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.05),
@@ -198,11 +198,11 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
                     child: ListTile(
                       contentPadding: MediaQueryUtil.getResponsivePadding(
                         horizontal: 50,
-                        vertical: 40,
+                        vertical: 30,
                       ),
                       leading: Container(
                         padding: EdgeInsets.all(
-                            MediaQueryUtil.getDefaultWidthDim(10)),
+                            MediaQueryUtil.getDefaultWidthDim(5)),
                         decoration: BoxDecoration(
                           color: const Color(0xFFD4AF37).withOpacity(0.1),
                           shape: BoxShape.circle,
@@ -268,16 +268,6 @@ class _Screen3State extends State<Screen3> with TickerProviderStateMixin {
 
   Widget _buildFooter(OpenStateBody openState) {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.1),
-          width: 1,
-        ),
-      ),
       child: Text(
         openState.footer,
         textAlign: TextAlign.center,

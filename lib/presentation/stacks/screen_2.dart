@@ -264,7 +264,7 @@ class _Screen2State extends State<Screen2> with TickerProviderStateMixin {
                 _buildHeaderSection(openState),
                 SizedBox(height: MediaQueryUtil.getDefaultHeightDim(20)),
                 _buildEMIPlanSection(openState),
-                SizedBox(height: MediaQueryUtil.getDefaultHeightDim(30)),
+                SizedBox(height: MediaQueryUtil.getDefaultHeightDim(300)),
                 _buildActionButton(ctaText),
               ],
             ),

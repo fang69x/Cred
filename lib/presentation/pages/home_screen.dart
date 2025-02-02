@@ -61,7 +61,6 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Future<void> _handleTap() async {
-    HapticFeedback.mediumImpact();
     await _animationController.reverse();
     if (mounted) {
       Navigator.push(context, ScreenTrans.introScreen());

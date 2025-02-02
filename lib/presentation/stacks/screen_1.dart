@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:cred/presentation/widgets/credit_card_widget.dart';
 import 'package:cred/presentation/widgets/curved_edge_button.dart';
 import 'package:cred/presentation/widgets/collapsed_glass_panel.dart';
@@ -35,6 +34,8 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
   @override
   void initState() {
     StackPopupModel.incCurrentStackPopupIndex();
+
+    // Slide Controller Initialization
     slideController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),
@@ -57,7 +58,9 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     MediaQueryUtil.init(context);
     return Consumer<CredDataProvider>(
+      // load emi plan
       builder: (context, credDataProvider, child) {
+        // loading state
         if (credDataProvider.isLoading) {
           return Center(
             child: CircularProgressIndicator(
@@ -66,7 +69,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
             ),
           );
         }
-
+        // Error state
         if (credDataProvider.error != null) {
           return _buildErrorState(credDataProvider.error!);
         }
@@ -75,7 +78,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
             credDataProvider.credData!.items.isEmpty) {
           return _buildEmptyState();
         }
-
+        // if success
         final firstItem = credDataProvider.credData!.items[0];
         final claT = firstItem.ctaText;
         final openState = firstItem.openState!.body;
@@ -224,6 +227,7 @@ class _Screen1State extends State<Screen1> with TickerProviderStateMixin {
     });
   }
 
+// when the next stack comes up and the data of last one is stored
   Widget _stackPopupView(OpenStateBody openState, ClosedStateBody closedState) {
     return GestureDetector(
       onTap: _reverseStackPopupAnim,
